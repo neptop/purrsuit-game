@@ -1,4 +1,4 @@
-package com.purrsuit.game;
+package com.purrsuit.game.screens;
 
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
