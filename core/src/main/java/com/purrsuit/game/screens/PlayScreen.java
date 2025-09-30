@@ -9,6 +9,9 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.purrsuit.game.ecs.WorldGrid;
+import com.purrsuit.game.ecs.Player;
+import com.purrsuit.game.util.Cell;
+import com.purrsuit.game.util.Direction;
 import com.purrsuit.game.util.GameConfig;
 
 public class PlayScreen extends ScreenAdapter {
@@ -16,7 +19,8 @@ public class PlayScreen extends ScreenAdapter {
     private final FitViewport viewport = new FitViewport(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, cam); // 1 unit = 1 tile
     private final ShapeRenderer shapes = new ShapeRenderer();
 
-    private  WorldGrid grid;
+    private WorldGrid grid;
+    private Player player;
 
     @Override
     public void show() {
@@ -26,12 +30,16 @@ public class PlayScreen extends ScreenAdapter {
 
         // temp walls
         grid.setWall(GameConfig.VIEW_W_TILES/2, GameConfig.VIEW_H_TILES/2, true);
+
+        // spawn player
+        player = new Player(grid, new Cell(2,2), Direction.RIGHT);
     }
 
     @Override
     public void render (float delta) {
         Gdx.gl.glClearColor(0.08f, 0.08f, 0.1f, 1f); // dark blueish
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT); // clear the screen
+        player.update(delta);
         cam.update();
         shapes.setProjectionMatrix(cam.combined);
 
@@ -55,6 +63,11 @@ public class PlayScreen extends ScreenAdapter {
                 }
             }
         }
+        shapes.end();
+
+        // draw player
+        shapes.begin(ShapeRenderer.ShapeType.Filled);
+        player.render(shapes);
         shapes.end();
     }
 
