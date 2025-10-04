@@ -20,7 +20,7 @@ public class Player {
     private Cell currentCell;
     private Cell targetCell;
     private Direction dir;
-    private Direction targetDir = null;
+    private Direction bufferedTurn;
     private float x,y; // position in tile cords
     private float t = 0f; // interpolation factor 0..1
 
@@ -32,7 +32,7 @@ public class Player {
         this.grid = grid;
         this.currentCell = startCell;
         this.targetCell = null;
-        this.targetDir = null;
+        this.bufferedTurn = null;
         this.dir = startDir;
         this.x = centerX(startCell);
         this.y = centerY(startCell);
@@ -40,66 +40,67 @@ public class Player {
 
     private void readInput() {
         Direction lastDir = null;
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) {
-            lastDir = Direction.LEFT;
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)) {
-            lastDir = Direction.RIGHT;
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) {
-            lastDir = Direction.UP;
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S)) {
-            lastDir = Direction.DOWN;
-        }
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) {lastDir = Direction.LEFT;}
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)) {lastDir = Direction.RIGHT;}
+        if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) {lastDir = Direction.UP;}
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S)) {lastDir = Direction.DOWN;}
 
-        // no 180 turns
-        if (lastDir != null) {
-            if(!(targetCell != null && lastDir == dir.opposite())) {
-                targetDir = lastDir;
+        if(lastDir != null) {
+            if (lastDir != dir.opposite()){
+                bufferedTurn = lastDir;
+            } else {
+                bufferedTurn = null; // ignore opposite direction input
+            }
+        } else {
+            bufferedTurn = null; // no input
+        }
+    }
+
+    // decide movement when at the center of a cell
+    private void decideCenter() {
+        if (bufferedTurn != null && bufferedTurn != dir.opposite()) {
+            Cell cand = currentCell.next(bufferedTurn);
+            if (grid.passable(cand)) {
+                dir = bufferedTurn;
+                targetCell = cand;
+                t = 0f;
+                bufferedTurn = null;
+                return;
+            }
+        }
+        if (isPressed(dir)) {
+            Cell fwd = currentCell.next(dir);
+            if (grid.passable(fwd)){
+                targetCell = fwd;
+                t = 0f;
             }
         }
     }
 
-    private void attemptTurn() {
-        if (targetDir == null){
-            return;
-        }
-        if (targetCell != null && targetDir == dir.opposite()) {
-            return;
-        }
-
-        Cell nextCell = currentCell.next(targetDir);
-        if (grid.passable(nextCell)) {
-            targetCell = nextCell;
-            dir = targetDir;
-            t = 0f;
-            targetDir = null;
-        }
-    }
-
-    public boolean nearCell(Cell c) {
-        float dx = Math.abs(x - centerX(c));
-        float dy = Math.abs(y - centerY(c));
-        return Math.max(dx, dy) < CORNER_RADIUS;
-    }
-
     private void recenterToCorridor(){
-        if (dir == null) {
-            float cy = centerY(currentCell);
-            float cx = centerX(currentCell);
-            x = MathUtils.lerp(x, cx, RECENTER_LERP);
-            y = MathUtils.lerp(y, cy, RECENTER_LERP);
-            return;
-        }
-        float targetX;
-        float targetY;
         if (dir == Direction.LEFT || dir == Direction.RIGHT) {
-            targetY = centerY(currentCell);
+            float targetY = centerY(currentCell);
             y = MathUtils.lerp(y, targetY, RECENTER_LERP);
-        } else {
-            targetX = centerX(currentCell);
+        } else if (dir == Direction.UP || dir == Direction.DOWN) {
+            float targetX = centerX(currentCell);
             x = MathUtils.lerp(x, targetX, RECENTER_LERP);
+        }
+        x = MathUtils.lerp(x, centerX(currentCell), RECENTER_LERP * 0.35f);
+        y = MathUtils.lerp(y, centerY(currentCell), RECENTER_LERP * 0.35f);
+    }
+
+    private boolean isPressed(Direction d) {
+        switch (d) {
+            case LEFT:
+                return Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A);
+            case RIGHT:
+                return Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D);
+            case UP:
+                return Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W);
+            case DOWN:
+                return Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S);
+            default:
+                return false;
         }
     }
 
@@ -109,36 +110,13 @@ public class Player {
         shapes.rectLine(x, y, x + 0.35f * dir.dx, y + 0.35f * dir.dy, 0.06f);
     }
 
-    public Cell getCurrentCell() {
-        return currentCell;
-    }
-    public Direction getDirection() {
-        return dir;
-    }
-    public float getX() {
-        return x;
-    }
-    public float getY() {
-        return y;
-    }
-
-
     // public API
     public void update(float dt) {
         readInput();
 
-        // corner buffering
-        if (nearCell(currentCell)){
-            attemptTurn();
-        }
-
-        // if no target, try to move forward if possible
-        if(targetCell == null){
-            Cell nextCell = currentCell.next(dir);
-            if (grid.passable(nextCell)) {
-                targetCell = nextCell;
-                t = 0f;
-            }
+        // move when key is held
+        if(targetCell == null) {
+            decideCenter();
         }
 
         // move towards next cell center
@@ -152,13 +130,7 @@ public class Player {
                 targetCell = null;
                 t = 0f;
 
-                attemptTurn();
-                Cell forwardCell = currentCell.next(dir);
-                if(grid.passable(forwardCell)){
-                    targetCell = forwardCell;
-                } else {
-                    dir = null; // stop movement
-                }
+                decideCenter();
 
             } else {
                 // interpolate towards target cell
