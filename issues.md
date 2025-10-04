@@ -1,8 +1,8 @@
 ## Resolved Issues ##
 - **[0]** Scaffold, basic project setup + skeleton
-- 
-## Open Issues ##
 - **[1]** Player movement
+
+## Open Issues ##
 - **[2]** More refined level structure
 - **[3]** Tethered cheese
 - **[4]** Projectile yarn
