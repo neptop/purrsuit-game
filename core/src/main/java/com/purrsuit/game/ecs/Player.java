@@ -9,6 +9,7 @@ import com.purrsuit.game.util.Cell;
 import com.purrsuit.game.util.Direction;
 
 public class Player {
+
     private final WorldGrid grid;
 
     // movement configs
@@ -27,6 +28,9 @@ public class Player {
     // utilities
     private float centerX(Cell c) { return c.x() + 0.5f; }
     private float centerY(Cell c) { return c.y() + 0.5f; }
+
+    // getters
+    public Cell getCurrentCell() { return currentCell; }
 
     public Player(WorldGrid grid, Cell startCell, Direction startDir) {
         this.grid = grid;
