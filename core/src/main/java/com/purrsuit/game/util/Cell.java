@@ -28,7 +28,6 @@ public final class Cell {
 
         Cell cell = (Cell) o;
 
-        if (x != cell.x) return false;
         return x == cell.x && y == cell.y;
     }
 

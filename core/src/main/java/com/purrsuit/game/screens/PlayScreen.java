@@ -7,9 +7,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.purrsuit.game.ecs.WorldGrid;
-import com.purrsuit.game.ecs.Player;
-import com.purrsuit.game.ecs.Level;
+import com.purrsuit.game.ecs.*;
 import com.purrsuit.game.util.Cell;
 import com.purrsuit.game.util.Direction;
 import com.purrsuit.game.util.GameConfig;
@@ -37,6 +35,8 @@ public class PlayScreen extends ScreenAdapter {
     private Level level;
     private Cell exitCell;
     private boolean win = false;
+    private TetheredCheese tether;
+    private Cell lastCell;
 
     @Override
     public void show() {
@@ -53,8 +53,17 @@ public class PlayScreen extends ScreenAdapter {
 
         shapes = new ShapeRenderer();
 
-        // spawn player at S cell
-        player = new Player(grid, level.getStart(), Direction.RIGHT);
+        // tether length 3 cells behind player
+        tether = new TetheredCheese(level.getStart(), 3);
+
+        // spawn player with blocker that includes tether cheese and treats it as a wall
+        player = new Player(grid, level.getStart(), Direction.RIGHT, new CellBlocker() {
+            @Override
+            public boolean isBlocked(Cell c) {
+                return tether.occupiesTrail(c) || tether.blocks(c);
+            }
+        });
+        lastCell = player.getCurrentCell();
     }
 
     @Override
@@ -64,7 +73,13 @@ public class PlayScreen extends ScreenAdapter {
 
         if (!win){
             player.update(delta);
-            if (player.getCurrentCell().equals(exitCell)){
+
+            Cell now = player.getCurrentCell();
+            if (!now.equals(lastCell)) {
+                tether.onHeadMoved(now);
+                lastCell = now;
+            }
+            if (now.equals(exitCell)){
                 win = true;
             }
         }
@@ -100,6 +115,7 @@ public class PlayScreen extends ScreenAdapter {
 
         // draw player
         shapes.begin(ShapeRenderer.ShapeType.Filled);
+        tether.render(shapes);
         player.render(shapes);
 
         // if you win, draw overlay

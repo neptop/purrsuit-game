@@ -2,9 +2,8 @@
 - **[0]** Scaffold, basic project setup + skeleton
 - **[1]** Player movement
 - **[2]** More refined level structure
-
-## Open Issues ##
 - **[3]** Tethered cheese
+## Open Issues ##
 - **[4]** Projectile yarn
 - **[5]** Chaser enemy + pathfinding
 - **[6]** Basic UI and HUD

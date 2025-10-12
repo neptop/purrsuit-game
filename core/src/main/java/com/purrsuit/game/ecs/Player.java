@@ -11,6 +11,7 @@ import com.purrsuit.game.util.Direction;
 public class Player {
 
     private final WorldGrid grid;
+    private final CellBlocker blocker;
 
     // movement configs
     private static final float TILE_SPEED = 6.0f; // tiles per second
@@ -32,7 +33,7 @@ public class Player {
     // getters
     public Cell getCurrentCell() { return currentCell; }
 
-    public Player(WorldGrid grid, Cell startCell, Direction startDir) {
+    public Player(WorldGrid grid, Cell startCell, Direction startDir, CellBlocker blocker) {
         this.grid = grid;
         this.currentCell = startCell;
         this.targetCell = null;
@@ -40,6 +41,11 @@ public class Player {
         this.dir = startDir;
         this.x = centerX(startCell);
         this.y = centerY(startCell);
+        this.blocker = blocker;
+    }
+
+    private boolean passable(Cell c){
+        return grid.passable(c) && (blocker == null || !blocker.isBlocked(c));
     }
 
     private void readInput() {
@@ -49,22 +55,14 @@ public class Player {
         if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) {lastDir = Direction.UP;}
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S)) {lastDir = Direction.DOWN;}
 
-        if(lastDir != null) {
-            if (lastDir != dir.opposite()){
-                bufferedTurn = lastDir;
-            } else {
-                bufferedTurn = null; // ignore opposite direction input
-            }
-        } else {
-            bufferedTurn = null; // no input
-        }
+        bufferedTurn = lastDir;
     }
 
     // decide movement when at the center of a cell
     private void decideCenter() {
-        if (bufferedTurn != null && bufferedTurn != dir.opposite()) {
+        if (bufferedTurn != null) {
             Cell cand = currentCell.next(bufferedTurn);
-            if (grid.passable(cand)) {
+            if (passable(cand)) {
                 dir = bufferedTurn;
                 targetCell = cand;
                 t = 0f;
@@ -74,7 +72,7 @@ public class Player {
         }
         if (isPressed(dir)) {
             Cell fwd = currentCell.next(dir);
-            if (grid.passable(fwd)){
+            if (passable(fwd)) {
                 targetCell = fwd;
                 t = 0f;
             }
