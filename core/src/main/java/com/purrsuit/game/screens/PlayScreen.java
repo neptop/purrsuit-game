@@ -20,9 +20,9 @@ public class PlayScreen extends ScreenAdapter {
         "#.##..#..#####..###.#",
         "#....##..#...#......#",
         "####.##..#.#.#.###..#",
-        "#...... ..#.#.#.....#",
-        "#.######.###.#.##...#",
-        "#.............#.....#",
+        "#...... ......#.....#",
+        "#.######.###....#...#",
+        "#...................#",
         "#####################"
     };
 
@@ -62,8 +62,13 @@ public class PlayScreen extends ScreenAdapter {
             public boolean isBlocked(Cell c) {
                 return tether.occupiesTrail(c) || tether.blocks(c);
             }
+        },
+        new StepListener() {
+            @Override
+            public void onEnter(Cell cell) {
+                tether.onHeadMoved(cell);
+            }
         });
-        lastCell = player.getCurrentCell();
     }
 
     @Override
@@ -75,10 +80,7 @@ public class PlayScreen extends ScreenAdapter {
             player.update(delta);
 
             Cell now = player.getCurrentCell();
-            if (!now.equals(lastCell)) {
-                tether.onHeadMoved(now);
-                lastCell = now;
-            }
+
             if (now.equals(exitCell)){
                 win = true;
             }
