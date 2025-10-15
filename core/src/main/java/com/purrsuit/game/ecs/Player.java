@@ -33,6 +33,7 @@ public class Player {
 
     // getters
     public Cell getCurrentCell() { return currentCell; }
+    public Direction getDirection() { return dir; }
 
     public Player(WorldGrid grid, Cell startCell, Direction startDir, CellBlocker blocker, StepListener stepListener) {
         this.grid = grid;
