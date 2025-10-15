@@ -12,6 +12,7 @@ public class Player {
 
     private final WorldGrid grid;
     private final CellBlocker blocker;
+    private final StepListener stepListener;
 
     // movement configs
     private static final float TILE_SPEED = 6.0f; // tiles per second
@@ -32,8 +33,9 @@ public class Player {
 
     // getters
     public Cell getCurrentCell() { return currentCell; }
+    public Direction getDirection() { return dir; }
 
-    public Player(WorldGrid grid, Cell startCell, Direction startDir, CellBlocker blocker) {
+    public Player(WorldGrid grid, Cell startCell, Direction startDir, CellBlocker blocker, StepListener stepListener) {
         this.grid = grid;
         this.currentCell = startCell;
         this.targetCell = null;
@@ -42,6 +44,7 @@ public class Player {
         this.x = centerX(startCell);
         this.y = centerY(startCell);
         this.blocker = blocker;
+        this.stepListener = stepListener;
     }
 
     private boolean passable(Cell c){
@@ -131,6 +134,8 @@ public class Player {
                 y = centerY(currentCell);
                 targetCell = null;
                 t = 0f;
+
+                if (stepListener != null) stepListener.onEnter(currentCell);
 
                 decideCenter();
 
