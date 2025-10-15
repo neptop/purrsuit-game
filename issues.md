@@ -3,8 +3,9 @@
 - **[1]** Player movement
 - **[2]** More refined level structure
 - **[3]** Tethered cheese
-## Open Issues ##
 - **[4]** Projectile yarn
+
+## Open Issues ##
 - **[5]** Chaser enemy + pathfinding
 - **[6]** Basic UI and HUD
 - **[7]** Complete tutorial level
