@@ -9,10 +9,11 @@
 - **[5]** Chaser enemy + pathfinding
 - **[6]** Basic UI and HUD
 - **[7]** Complete tutorial level
-- **[8]** More levels
-- **[9]** Sound effects
-- **[10]** Background music
-- **[11]** Main menu
-- **[12]** Pause menu
-- **[13]** Game over screen
-- **[14]** Victory screen
+- **[8]** Add in art assets
+- **[9]** More levels
+- **[10]** Sound effects
+- **[11]** Background music
+- **[12]** Main menu
+- **[13]** Pause menu
+- **[14]** Game over screen
+- **[15]** Victory screen
