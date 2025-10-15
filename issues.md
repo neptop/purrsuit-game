@@ -8,12 +8,13 @@
 ## Open Issues ##
 - **[5]** Chaser enemy + pathfinding
 - **[6]** Basic UI and HUD
-- **[7]** Complete tutorial level
-- **[8]** Add in art assets
-- **[9]** More levels
-- **[10]** Sound effects
-- **[11]** Background music
-- **[12]** Main menu
-- **[13]** Pause menu
-- **[14]** Game over screen
-- **[15]** Victory screen
+- **[7]** Switches and doors
+- **[8]** Complete tutorial level
+- **[9]** Add in art assets
+- **[10]** More levels
+- **[11]** Sound effects
+- **[12]** Background music
+- **[13]** Main menu
+- **[14]** Pause menu
+- **[15]** Game over screen
+- **[16]** Victory screen
