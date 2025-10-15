@@ -1,6 +1,7 @@
 package com.purrsuit.game.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -37,6 +38,8 @@ public class PlayScreen extends ScreenAdapter {
     private boolean win = false;
     private TetheredCheese tether;
     private Cell lastCell;
+    private YarnSystem yarns;
+    private boolean canShoot = true;
 
     @Override
     public void show() {
@@ -69,6 +72,8 @@ public class PlayScreen extends ScreenAdapter {
                 tether.onHeadMoved(cell);
             }
         });
+
+        yarns = new YarnSystem(grid);
     }
 
     @Override
@@ -78,6 +83,16 @@ public class PlayScreen extends ScreenAdapter {
 
         if (!win){
             player.update(delta);
+
+            // shoot yarn projectile
+            if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+                Direction aim = player.getDirection();
+                if (aim != null && canShoot) {
+                    yarns.shoot(player.getCurrentCell(), aim);
+                }
+            }
+
+            yarns.update(delta);
 
             Cell now = player.getCurrentCell();
 
@@ -118,6 +133,7 @@ public class PlayScreen extends ScreenAdapter {
         // draw player
         shapes.begin(ShapeRenderer.ShapeType.Filled);
         tether.render(shapes);
+        yarns.render(shapes);
         player.render(shapes);
 
         // if you win, draw overlay
