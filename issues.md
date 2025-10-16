@@ -11,10 +11,11 @@
 - **[7]** Switches and doors
 - **[8]** Complete tutorial level
 - **[9]** Add in art assets
-- **[10]** More levels
-- **[11]** Sound effects
-- **[12]** Background music
-- **[13]** Main menu
-- **[14]** Pause menu
-- **[15]** Game over screen
-- **[16]** Victory screen
+- **[10]** Add power-ups
+- **[11]** More levels
+- **[12]** Sound effects
+- **[13]** Background music
+- **[14]** Main menu
+- **[15]** Pause menu
+- **[16]** Game over screen
+- **[17]** Victory screen
