@@ -14,6 +14,7 @@ import com.purrsuit.game.util.Direction;
 import com.purrsuit.game.util.GameConfig;
 import java.util.ArrayList;
 import java.util.List;
+import com.purrsuit.game.hud.HUD;
 
 public class PlayScreen extends ScreenAdapter {
 
@@ -43,6 +44,8 @@ public class PlayScreen extends ScreenAdapter {
     private boolean canShoot = true;
     private EnemySystem enemies;
     private List<EnemySpawner> spawners;
+    private HUD hud;
+    private int levelIndex = 1;
 
     @Override
     public void show() {
@@ -58,6 +61,9 @@ public class PlayScreen extends ScreenAdapter {
         cam.update();
 
         shapes = new ShapeRenderer();
+
+        // hud
+        hud = new HUD();
 
         // tether length 3 cells behind player
         tether = new TetheredCheese(level.getStart(), 3);
@@ -149,6 +155,10 @@ public class PlayScreen extends ScreenAdapter {
         }
         shapes.end();
 
+        // draw hud
+        hud.setCheeseHp(tether.getCurrentHp(), tether.getMaxHp());
+        hud.setLevelNumber(levelIndex);
+
         // draw walls
         shapes.begin(ShapeRenderer.ShapeType.Filled);
         shapes.setColor(new Color(0.8f,0.2f,0.2f,0.8f)); // semi-transparent red
@@ -179,6 +189,7 @@ public class PlayScreen extends ScreenAdapter {
         yarns.render(shapes);
         enemies.render(shapes);
         player.render(shapes);
+        hud.render();
 
         // if you win, draw overlay
         if (win) {
@@ -193,10 +204,16 @@ public class PlayScreen extends ScreenAdapter {
     @Override
     public void resize (int width, int height) {
         viewport.update(width, height, true);
+        if(hud != null){
+            hud.resize(width, height);
+        }
     }
 
     @Override
     public void dispose () {
         shapes.dispose();
+        if (hud != null){
+            hud.dispose();
+        }
     }
 }
