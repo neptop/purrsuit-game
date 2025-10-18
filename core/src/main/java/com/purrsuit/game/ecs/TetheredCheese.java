@@ -7,8 +7,21 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 public class TetheredCheese {
+    // fields
     private final Deque<Cell> trail = new ArrayDeque<>();
     private final int tetherLength; // distance behind player (3 cells atm)
+    private int maxHp = 3;
+    private int currentHp = maxHp;
+
+    // getters
+    public int getMaxHp() { return maxHp; }
+    public int getCurrentHp() { return currentHp; }
+
+    // methods
+    public boolean isNotActive() { return currentHp <= 0; }
+    public void damage (int amount) { currentHp = Math.max(0, currentHp - amount); }
+    public void heal (int amount) { currentHp = Math.min(maxHp, currentHp + amount); }
+
 
     public TetheredCheese(Cell start, int tetherLength) {
         this.tetherLength = Math.max(1, tetherLength);

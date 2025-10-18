@@ -3,15 +3,19 @@
 - **[1]** Player movement
 - **[2]** More refined level structure
 - **[3]** Tethered cheese
-## Open Issues ##
 - **[4]** Projectile yarn
 - **[5]** Chaser enemy + pathfinding
+
+## Open Issues ##
 - **[6]** Basic UI and HUD
-- **[7]** Complete tutorial level
-- **[8]** More levels
-- **[9]** Sound effects
-- **[10]** Background music
-- **[11]** Main menu
-- **[12]** Pause menu
-- **[13]** Game over screen
-- **[14]** Victory screen
+- **[7]** Switches and doors
+- **[8]** Complete tutorial level
+- **[9]** Add in art assets
+- **[10]** Add power-ups
+- **[11]** More levels
+- **[12]** Sound effects
+- **[13]** Background music
+- **[14]** Main menu
+- **[15]** Pause menu
+- **[16]** Game over screen
+- **[17]** Victory screen

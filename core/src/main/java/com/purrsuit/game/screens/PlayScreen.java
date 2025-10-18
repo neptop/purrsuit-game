@@ -12,6 +12,8 @@ import com.purrsuit.game.ecs.*;
 import com.purrsuit.game.util.Cell;
 import com.purrsuit.game.util.Direction;
 import com.purrsuit.game.util.GameConfig;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PlayScreen extends ScreenAdapter {
 
@@ -23,14 +25,13 @@ public class PlayScreen extends ScreenAdapter {
         "####.##..#.#.#.###..#",
         "#...... ......#.....#",
         "#.######.###....#...#",
-        "#...................#",
+        "#..................M#",
         "#####################"
     };
 
     private OrthographicCamera cam;
     private FitViewport viewport;
     private ShapeRenderer shapes;
-
     private WorldGrid grid;
     private Player player;
     private Level level;
@@ -40,6 +41,8 @@ public class PlayScreen extends ScreenAdapter {
     private Cell lastCell;
     private YarnSystem yarns;
     private boolean canShoot = true;
+    private EnemySystem enemies;
+    private List<EnemySpawner> spawners;
 
     @Override
     public void show() {
@@ -74,6 +77,26 @@ public class PlayScreen extends ScreenAdapter {
         });
 
         yarns = new YarnSystem(grid);
+
+        enemies = new EnemySystem(grid);
+        spawners = new ArrayList<EnemySpawner>();
+        for (Cell spawnerCell : level.getSpawners()) {
+            spawners.add(new EnemySpawner(spawnerCell, 5f));
+        }
+
+        yarns.setCollisionProbe(new YarnSystem.CollisionProbe() {
+            @Override
+            public boolean isColliding(Cell cell) {
+                return enemies.hasEnemyAt(cell);
+            }
+        });
+
+        yarns.setImpactHook(new YarnSystem.ImpactHook() {
+            @Override
+            public void onImpact(Cell impactCell, Direction dir) {
+                enemies.killEnemiesAt(impactCell);
+            }
+        });
     }
 
     @Override
@@ -94,7 +117,19 @@ public class PlayScreen extends ScreenAdapter {
 
             yarns.update(delta);
 
+            Cell cheeseCell = tether.getCheeseCell();
+            Direction aim = player.getDirection();
             Cell now = player.getCurrentCell();
+
+            for (EnemySpawner spawner : spawners) {
+                if (spawner.tick(delta)) {
+                    enemies.spawn(spawner.getCell());
+                }
+            }
+
+            if (cheeseCell != null) {
+                enemies.update(delta, cheeseCell, now, aim, tether);
+            }
 
             if (now.equals(exitCell)){
                 win = true;
@@ -124,16 +159,25 @@ public class PlayScreen extends ScreenAdapter {
                 }
             }
         }
+
+        // draw spawners
+        shapes.setColor(new Color(0.2f, 0.6f, 1f, 0.6f));// blueish
+        for (Cell s : level.getSpawners()) {
+            shapes.rect(s.x(), s.y(), 1, 1);
+        }
+
+        // draw start and exit
         shapes.setColor(new Color(0.1f, 0.9f, 0.2f, 0.35f)); // start green
         shapes.rect(level.getStart().x(), level.getStart().y(), 1, 1);
         shapes.setColor(new Color(0.1f, 1f, 0.3f, 0.85f)); // exit red
         shapes.rect(exitCell.x(), exitCell.y(), 1, 1);
         shapes.end();
 
-        // draw player
+        // draw entities
         shapes.begin(ShapeRenderer.ShapeType.Filled);
         tether.render(shapes);
         yarns.render(shapes);
+        enemies.render(shapes);
         player.render(shapes);
 
         // if you win, draw overlay
