@@ -19,11 +19,13 @@ public class YarnSystem {
     private final List<YarnProjectile> projectiles = new ArrayList<>();
     private ImpactHook hook;
     private CollisionProbe probe;
+    private CellBlocker blocker;
 
     public YarnSystem(WorldGrid grid) {
         this.grid = grid;
     }
 
+    public void setBlocker(CellBlocker blocker) {this.blocker = blocker;}
     public void setImpactHook(ImpactHook hook) {
         this.hook = hook;
     }
@@ -36,6 +38,7 @@ public class YarnSystem {
             grid,
             startCell,
             dir,
+            blocker,
             (impactCell, impactDir) -> {if (hook != null) hook.onImpact(impactCell, impactDir); },
             (cell) -> probe != null && probe.isColliding(cell)
         );

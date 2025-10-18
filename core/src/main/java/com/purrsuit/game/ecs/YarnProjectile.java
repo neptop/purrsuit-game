@@ -29,14 +29,16 @@ public class YarnProjectile {
     private float t = 0f; // interpolation factor 0..1
     private boolean active = true;
     private float x, y; // position in tile coords
+    private final CellBlocker blocker;
 
-    public YarnProjectile(WorldGrid grid, Cell startCell, Direction dir, ImpactListener listener, CollisionProbe probe) {
+    public YarnProjectile(WorldGrid grid, Cell startCell, Direction dir, CellBlocker blocker, ImpactListener listener, CollisionProbe probe) {
         this.grid = grid;
         this.currentCell = startCell;
         this.targetCell = null;
         this.dir = dir;
         this.listener = listener;
         this.probe = probe;
+        this.blocker = blocker;
         this.x = startCell.x() + 0.5f;
         this.y = startCell.y() + 0.5f;
     }
@@ -45,7 +47,8 @@ public class YarnProjectile {
     public Direction getDirection() { return dir; }
 
     private boolean passable(Cell c) {
-        return grid.passable(c); // only cares about walls here, not entities. Entities are handled by the ImpactListener.
+        if(!grid.passable(c)) return false;
+        return (blocker == null || !blocker.isBlocked(c));
     }
 
     // returns false if it collides with a wall and is no longer active

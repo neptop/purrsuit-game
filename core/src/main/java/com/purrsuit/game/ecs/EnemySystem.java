@@ -13,9 +13,9 @@ public class EnemySystem {
     private final HeatField heat;
     private final List<EnemyChaserMice> enemies = new ArrayList<>();
 
-    public EnemySystem(WorldGrid grid) {
+    public EnemySystem(WorldGrid grid, CellBlocker blocker) {
         this.grid = grid;
-        this.path = new Pathfinder(grid);
+        this.path = new Pathfinder(grid, blocker);
         this.heat = new HeatField(grid.getWidth(), grid.getHeight());
     }
 
