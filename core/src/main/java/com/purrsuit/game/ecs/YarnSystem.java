@@ -11,10 +11,14 @@ public class YarnSystem {
     public interface ImpactHook{
         void onImpact(Cell impactCell, Direction dir);
     }
+    public interface CollisionProbe{
+        boolean isColliding(Cell cell);
+    }
 
     private final WorldGrid grid;
     private final List<YarnProjectile> projectiles = new ArrayList<>();
     private ImpactHook hook;
+    private CollisionProbe probe;
 
     public YarnSystem(WorldGrid grid) {
         this.grid = grid;
@@ -23,15 +27,18 @@ public class YarnSystem {
     public void setImpactHook(ImpactHook hook) {
         this.hook = hook;
     }
+    public void setCollisionProbe(CollisionProbe probe) {
+        this.probe = probe;
+    }
+
     public void shoot(Cell startCell, Direction dir) {
-        YarnProjectile p = new YarnProjectile(grid, startCell, dir, (impactCell, impactDir) -> {
-            if (hook != null) {
-                try {
-                    hook.onImpact(impactCell, impactDir);
-                } catch (Exception ignore) {
-                }
-            }
-        });
+        YarnProjectile p = new YarnProjectile(
+            grid,
+            startCell,
+            dir,
+            (impactCell, impactDir) -> {if (hook != null) hook.onImpact(impactCell, impactDir); },
+            (cell) -> probe != null && probe.isColliding(cell)
+        );
         projectiles.add(p);
     }
 
@@ -39,8 +46,7 @@ public class YarnSystem {
         Iterator<YarnProjectile> iter = projectiles.iterator();
         while (iter.hasNext()) {
             YarnProjectile p = iter.next();
-            boolean active = p.update(dt);
-            if (!active) {
+            if (!p.update(dt)) {
                 iter.remove();
             }
         }
