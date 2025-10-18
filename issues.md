@@ -13,9 +13,9 @@
 - **[9]** Add in art assets
 - **[10]** Add power-ups
 - **[11]** More levels
-- **[12]** Sound effects
-- **[13]** Background music
-- **[14]** Main menu
-- **[15]** Pause menu
-- **[16]** Game over screen
-- **[17]** Victory screen
+- **[12]** Main menu
+- **[13]** Pause menu
+- **[14]** Game over screen
+- **[15]** Victory screen
+- **[16]** Sound effects
+
