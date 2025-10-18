@@ -6,9 +6,9 @@
 - **[4]** Projectile yarn
 - **[5]** Chaser enemy + pathfinding
 - **[6]** Basic UI and HUD
+- **[7]** Switches and doors
 
 ## Open Issues ##
-- **[7]** Switches and doors
 - **[8]** Complete tutorial level
 - **[9]** Add in art assets
 - **[10]** Add power-ups
