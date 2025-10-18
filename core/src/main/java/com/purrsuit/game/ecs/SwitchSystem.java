@@ -14,10 +14,21 @@ public class SwitchSystem {
         switchesById.computeIfAbsent(sw.getId(), k -> new ArrayList<>()).add(sw);
     }
 
+    // Returns the switch at the given cell, or null if none exists
     public Switch at (Cell cell) {
         return switchByCell.get(cell);
     }
 
+    // Returns the switch id at the given cell, or null if none exists
+    public Character getSwitchIdAt(Cell cell) {
+        Switch sw = switchByCell.get(cell);
+        if (sw != null) {
+            return sw.getId();
+        }
+        return null;
+    }
+
+    // Toggles all switches with the given lowercase id
     public void toggleId(char idLowercase){
         List<Switch> list = switchesById.get(idLowercase);
         if(list == null) return;

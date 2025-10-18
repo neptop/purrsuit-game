@@ -14,22 +14,25 @@ import com.purrsuit.game.util.Direction;
 import com.purrsuit.game.util.GameConfig;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 import com.purrsuit.game.hud.HUD;
 
 public class PlayScreen extends ScreenAdapter {
 
     private static final String[] MAP = new String[] {
         "#####################",
-        "#S....#...........E.#",
+        "#S...a#...........E.#",
         "#.##..#..#####..###.#",
         "#....##..#...#......#",
-        "####.##..#.#.#.###..#",
+        "####A##..#.#.#.###..#",
         "#...... ......#.....#",
         "#.######.###....#...#",
         "#..................M#",
         "#####################"
     };
 
+    // fields
     private OrthographicCamera cam;
     private FitViewport viewport;
     private ShapeRenderer shapes;
@@ -46,6 +49,8 @@ public class PlayScreen extends ScreenAdapter {
     private List<EnemySpawner> spawners;
     private HUD hud;
     private int levelIndex = 1;
+    private DoorSystem doorSystem;
+    private SwitchSystem switchSystem;
 
     @Override
     public void show() {
@@ -65,26 +70,50 @@ public class PlayScreen extends ScreenAdapter {
         // hud
         hud = new HUD();
 
+        // door and switch systems
+        doorSystem = new DoorSystem();
+        switchSystem = new SwitchSystem();
+
+        // build from level data
+        for (Map.Entry<Character, List<Cell>> doorEntry : level.getDoorsById().entrySet()) {
+            char id = doorEntry.getKey();
+            for (Cell doorCell : doorEntry.getValue()) {
+                doorSystem.addDoor(new Door(doorCell, id, false));
+            }
+        }
+        for (Map.Entry<Character, List<Cell>> switchEntry : level.getSwitchesById().entrySet()) {
+            char id = switchEntry.getKey();
+            for (Cell switchCell : switchEntry.getValue()) {
+                switchSystem.addSwitch(new Switch(switchCell, id));
+            }
+        }
+
         // tether length 3 cells behind player
         tether = new TetheredCheese(level.getStart(), 3);
 
-        // spawn player with blocker that includes tether cheese and treats it as a wall
-        player = new Player(grid, level.getStart(), Direction.RIGHT, new CellBlocker() {
+        // composite blocker that includes doors
+        CellBlocker compositeBlocker = new CompositeBlocker(
+            new CellBlocker(){
+                @Override
+                public boolean isBlocked(Cell c) {
+                    return tether.occupiesTrail(c) || tether.blocks(c);
+                }
+            },
+            doorSystem
+        );
+
+        // spawn player pass in composite blocker
+        player = new Player(grid, level.getStart(), Direction.RIGHT, compositeBlocker, new StepListener() {
             @Override
-            public boolean isBlocked(Cell c) {
-                return tether.occupiesTrail(c) || tether.blocks(c);
-            }
-        },
-        new StepListener() {
-            @Override
-            public void onEnter(Cell cell) {
+            public void onEnter(Cell cell){
                 tether.onHeadMoved(cell);
             }
         });
 
         yarns = new YarnSystem(grid);
+        yarns.setBlocker(compositeBlocker);
 
-        enemies = new EnemySystem(grid);
+        enemies = new EnemySystem(grid, doorSystem);
         spawners = new ArrayList<EnemySpawner>();
         for (Cell spawnerCell : level.getSpawners()) {
             spawners.add(new EnemySpawner(spawnerCell, 5f));
@@ -101,6 +130,11 @@ public class PlayScreen extends ScreenAdapter {
             @Override
             public void onImpact(Cell impactCell, Direction dir) {
                 enemies.killEnemiesAt(impactCell);
+
+                Character sid = switchSystem.getSwitchIdAt(impactCell);
+                if (sid != null) {
+                    boolean opened = doorSystem.toggleDoors(sid.charValue());
+                }
             }
         });
     }
@@ -155,10 +189,6 @@ public class PlayScreen extends ScreenAdapter {
         }
         shapes.end();
 
-        // draw hud
-        hud.setCheeseHp(tether.getCurrentHp(), tether.getMaxHp());
-        hud.setLevelNumber(levelIndex);
-
         // draw walls
         shapes.begin(ShapeRenderer.ShapeType.Filled);
         shapes.setColor(new Color(0.8f,0.2f,0.2f,0.8f)); // semi-transparent red
@@ -176,6 +206,10 @@ public class PlayScreen extends ScreenAdapter {
             shapes.rect(s.x(), s.y(), 1, 1);
         }
 
+        // draw doors and switches
+        doorSystem.render(shapes);
+        switchSystem.render(shapes);
+
         // draw start and exit
         shapes.setColor(new Color(0.1f, 0.9f, 0.2f, 0.35f)); // start green
         shapes.rect(level.getStart().x(), level.getStart().y(), 1, 1);
@@ -189,7 +223,6 @@ public class PlayScreen extends ScreenAdapter {
         yarns.render(shapes);
         enemies.render(shapes);
         player.render(shapes);
-        hud.render();
 
         // if you win, draw overlay
         if (win) {
@@ -199,6 +232,11 @@ public class PlayScreen extends ScreenAdapter {
             shapes.circle(exitCell.x()+0.5f, exitCell.y()+0.5f, 0.5f, 24); // sparkles
         }
         shapes.end();
+
+        // draw hud
+        hud.setCheeseHp(tether.getCurrentHp(), tether.getMaxHp());
+        hud.setLevelNumber(levelIndex);
+        hud.render();
     }
 
     @Override

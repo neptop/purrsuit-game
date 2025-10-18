@@ -14,6 +14,7 @@ public class DoorSystem implements CellBlocker{
         doorsById.computeIfAbsent(door.getId(), k -> new ArrayList<>()).add(door);
     }
 
+    // Returns the door at the given cell, or null if none exists
     public void toggle(char idLowercase){
         List<Door> list = doorsById.get(idLowercase);
         if(list == null) return;
@@ -22,6 +23,14 @@ public class DoorSystem implements CellBlocker{
         }
     }
 
+    // Toggles all doors with the given lowercase id
+    public boolean toggleDoors(char idLowerccase){
+        toggle(idLowerccase);
+        return true;
+    }
+
+
+    // Returns true if the cell is blocked by a closed door
     public boolean isBlocked(Cell cell) {
         Door door = doorsByCell.get(cell);
         return door != null && !door.isOpen();
@@ -31,12 +40,11 @@ public class DoorSystem implements CellBlocker{
         for (Door door : doorsByCell.values()) {
             Cell cell = door.getCell();
             if (door.isOpen()) {
-                shapes.setColor(new Color(0.3f, 0.8f, 0.95f, 0.7f)); // cyan outline for open doors
-                shapes.rect(cell.x(), cell.y(), 1f, 1f);
+                shapes.setColor(new Color(0.25f, 0.25f, 0.25f, 0.01f)); // almost transparent for open doors
             } else {
                 shapes.setColor(new Color(0.15f, 0.55f, 0.8f, 0.95f)); // solid blue for closed doors
-                shapes.rect(cell.x(), cell.y(), 1f, 1f);
             }
+            shapes.rect(cell.x(), cell.y(), 1f, 1f);
         }
     }
 }

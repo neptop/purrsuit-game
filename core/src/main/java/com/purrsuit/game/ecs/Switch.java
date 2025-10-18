@@ -13,6 +13,10 @@ public class Switch {
         this.state = state;
     }
 
+    public Switch(Cell cell, char id) {
+        this(cell, id, false);
+    }
+
     public Cell getCell() {
         return cell;
     }

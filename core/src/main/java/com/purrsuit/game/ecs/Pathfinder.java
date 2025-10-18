@@ -12,11 +12,24 @@ public class Pathfinder {
     private final float [][] dist;
     private final Direction[] dirs = {Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT};
 
-    public Pathfinder(WorldGrid grid) {
+    private final CellBlocker blocker;
+
+    public Pathfinder(WorldGrid grid){
+        this(grid, null);
+    }
+
+    public Pathfinder(WorldGrid grid, CellBlocker blocker) {
         this.grid = grid;
         this.width = grid.getWidth();
         this.height = grid.getHeight();
         this.dist = new float[width][height];
+        this.blocker = blocker;
+    }
+
+    private boolean passable(Cell c){
+        if(!grid.inBounds(c)) return false;
+        if(blocker != null && blocker.isBlocked(c)) return false;
+        return true;
     }
 
     private static class Node implements Comparable<Node> {
@@ -73,7 +86,9 @@ public class Pathfinder {
             int nx = fromCell.x() + dir.dx;
             int ny = fromCell.y() + dir.dy;
             if (nx < 0 || nx >= width || ny < 0 || ny >= height) continue; // out of bounds
-            if (grid.isWall(new Cell(nx, ny))) continue; // wall
+
+            Cell nextCell = new Cell(nx, ny);
+            if (!passable(nextCell)) continue; // not passable
             if (dist[nx][ny] < best) {
                 best = dist[nx][ny];
                 bestDir = dir;
