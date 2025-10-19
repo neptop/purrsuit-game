@@ -11,12 +11,14 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.purrsuit.game.ecs.*;
 import com.purrsuit.game.util.Cell;
 import com.purrsuit.game.util.Direction;
-import com.purrsuit.game.util.GameConfig;
 import com.purrsuit.game.io.LevelIO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.Texture;
 import com.purrsuit.game.hud.HUD;
 
 public class PlayScreen extends ScreenAdapter {
@@ -40,6 +42,9 @@ public class PlayScreen extends ScreenAdapter {
     private int levelIndex = 1;
     private DoorSystem doorSystem;
     private SwitchSystem switchSystem;
+    private AssetManager assets;
+    private TextureAtlas atlas;
+    private SpriteBatch batch;
 
     @Override
     public void show() {
@@ -55,6 +60,16 @@ public class PlayScreen extends ScreenAdapter {
         cam.update();
 
         shapes = new ShapeRenderer();
+
+        batch = new SpriteBatch();
+        assets = new AssetManager();
+        assets.load("atlas/sprites.atlas", TextureAtlas.class);
+        assets.finishLoading();
+
+        atlas = assets.get("atlas/sprites.atlas", TextureAtlas.class);
+        for (Texture t : atlas.getTextures()) {
+            t.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        }
 
         // hud
         hud = new HUD();
@@ -241,6 +256,12 @@ public class PlayScreen extends ScreenAdapter {
         shapes.dispose();
         if (hud != null){
             hud.dispose();
+        }
+        if (assets != null){
+            assets.dispose();
+        }
+        if (batch != null) {
+            batch.dispose();
         }
     }
 }
