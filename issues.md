@@ -7,9 +7,9 @@
 - **[5]** Chaser enemy + pathfinding
 - **[6]** Basic UI and HUD
 - **[7]** Switches and doors
+- **[8]** Complete tutorial level
 
 ## Open Issues ##
-- **[8]** Complete tutorial level
 - **[9]** Add in art assets
 - **[10]** Add power-ups
 - **[11]** More levels

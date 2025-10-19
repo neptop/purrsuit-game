@@ -12,6 +12,7 @@ import com.purrsuit.game.ecs.*;
 import com.purrsuit.game.util.Cell;
 import com.purrsuit.game.util.Direction;
 import com.purrsuit.game.util.GameConfig;
+import com.purrsuit.game.io.LevelIO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,18 +20,6 @@ import java.util.Map;
 import com.purrsuit.game.hud.HUD;
 
 public class PlayScreen extends ScreenAdapter {
-
-    private static final String[] MAP = new String[] {
-        "#####################",
-        "#S...a#...........E.#",
-        "#.##..#..#####..###.#",
-        "#....##..#...#......#",
-        "####A##..#.#.#.###..#",
-        "#...... ......#.....#",
-        "#.######.###....#...#",
-        "#..................M#",
-        "#####################"
-    };
 
     // fields
     private OrthographicCamera cam;
@@ -55,7 +44,7 @@ public class PlayScreen extends ScreenAdapter {
     @Override
     public void show() {
         // load level from ASCII map
-        level = Level.ASCIIToLevel(MAP);
+        level = LevelIO.load("levels/Level1.txt");
         grid = level.getGrid();
         exitCell = level.getExit();
 
