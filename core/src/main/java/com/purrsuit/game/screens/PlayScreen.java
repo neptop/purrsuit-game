@@ -237,6 +237,10 @@ public class PlayScreen extends ScreenAdapter {
         TextureAtlas.AtlasRegion cheeseTex = atlas.findRegion("Cheese");
         TextureAtlas.AtlasRegion mouseTex = atlas.findRegion("Mouse");
         TextureAtlas.AtlasRegion yarnTex = atlas.findRegion("Yarn");
+        TextureAtlas.AtlasRegion tetherTex = atlas.findRegion("Tether");
+
+        // draw tether trail
+        tether.render(batch, tetherTex);
 
         // player
         {
@@ -268,8 +272,6 @@ public class PlayScreen extends ScreenAdapter {
         batch.end();
 
         shapes.begin(ShapeRenderer.ShapeType.Filled);
-        // draw tether
-        tether.render(shapes);
 
         // if you win, draw overlay
         if (win) {
