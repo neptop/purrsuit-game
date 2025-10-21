@@ -83,9 +83,5 @@ public class TetheredCheese {
             }
             prev = c;
         }
-        Cell cheese = getCheeseCell();
-        if (cheese != null) {
-            shapes.circle(cheese.x() + 0.5f, cheese.y() + 0.5f, 0.3f, 20);
-        }
     }
 }
