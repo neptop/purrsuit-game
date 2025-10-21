@@ -42,9 +42,13 @@ public class YarnProjectile {
         this.x = startCell.x() + 0.5f;
         this.y = startCell.y() + 0.5f;
     }
+
+    // getters
     public boolean isActive() { return active; } // true if still flying
     public Cell getCurrentCell() { return currentCell; }
     public Direction getDirection() { return dir; }
+    public float getRenderX() { return x; }
+    public float getRenderY() { return y; }
 
     private boolean passable(Cell c) {
         if(!grid.passable(c)) return false;
