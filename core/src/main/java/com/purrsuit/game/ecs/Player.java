@@ -26,6 +26,7 @@ public class Player {
     private Direction bufferedTurn;
     private float x,y; // position in tile cords
     private float t = 0f; // interpolation factor 0..1
+    private final PowerUpSystem powerups;
 
     // utilities
     private float centerX(Cell c) { return c.x() + 0.5f; }
@@ -37,7 +38,7 @@ public class Player {
     public float getRenderX() { return x; }
     public float getRenderY() { return y; }
 
-    public Player(WorldGrid grid, Cell startCell, Direction startDir, CellBlocker blocker, StepListener stepListener) {
+    public Player(WorldGrid grid, Cell startCell, Direction startDir, CellBlocker blocker, StepListener stepListener, PowerUpSystem powerups) {
         this.grid = grid;
         this.currentCell = startCell;
         this.targetCell = null;
@@ -47,6 +48,7 @@ public class Player {
         this.y = centerY(startCell);
         this.blocker = blocker;
         this.stepListener = stepListener;
+        this.powerups = powerups;
     }
 
     private boolean passable(Cell c){
@@ -128,7 +130,8 @@ public class Player {
 
         // move towards next cell center
         if (targetCell != null) {
-            t += dt * TILE_SPEED;
+            float speed = TILE_SPEED * (powerups != null ? powerups.speedMultiplier() : 1f);
+            t += dt * speed;
             if (t >= 1f) {
                 // reached target cell
                 currentCell = targetCell;
