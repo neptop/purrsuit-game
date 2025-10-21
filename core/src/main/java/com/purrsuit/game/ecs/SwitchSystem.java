@@ -9,6 +9,10 @@ public class SwitchSystem {
     private final Map<Character, List<Switch>> switchesById = new HashMap<>();
     private final Map<Cell, Switch> switchByCell = new HashMap<>();
 
+    public Iterable<Switch> allSwitches() {
+        return switchByCell.values();
+    }
+
     public void addSwitch(Switch sw) {
         switchByCell.put(sw.getCell(), sw);
         switchesById.computeIfAbsent(sw.getId(), k -> new ArrayList<>()).add(sw);
