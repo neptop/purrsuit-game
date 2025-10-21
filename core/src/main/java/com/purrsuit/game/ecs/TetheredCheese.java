@@ -2,6 +2,8 @@ package com.purrsuit.game.ecs;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.purrsuit.game.util.Cell;
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -69,19 +71,40 @@ public class TetheredCheese {
         return cheeseCell != null && cheeseCell.equals(c);
     }
 
-    // temp simple rendering
-    public void render(ShapeRenderer shapes) {
-        shapes.setColor(Color.YELLOW);
+    public void render(SpriteBatch batch, TextureAtlas.AtlasRegion tetherTex) {
         Cell prev = null;
         for (Cell c : trail) {
             if (prev != null) {
-                float x1 = prev.x() + 0.5f;
-                float y1 = prev.y() + 0.5f;
-                float x2 = c.x() + 0.5f;
-                float y2 = c.y() + 0.5f;
-                shapes.rectLine(x1, y1, x2, y2, 0.1f);
+                drawSegment(batch, prev, c, tetherTex);
             }
             prev = c;
         }
+    }
+
+    private void drawSegment(SpriteBatch batch, Cell a, Cell b, TextureAtlas.AtlasRegion texture) {
+        float x1 = a.x() + 0.5f;
+        float y1 = a.y() + 0.5f;
+        float x2 = b.x() + 0.5f;
+        float y2 = b.y() + 0.5f;
+
+        float dx = x2 - x1;
+        float dy = y2 - y1;
+        float len = (float)Math.sqrt(dx * dx + dy * dy);
+        float angleDeg = (float)(Math.atan2(dy, dx) * 180f / Math.PI);
+
+        float thickness = 1f; // thickness of the tether segment
+
+        batch.draw(
+            texture,
+            x1 - thickness / 2f, // center the texture on the line
+            y1 - thickness / 2f,
+            thickness / 2f, // origin at center of thickness
+            thickness / 2f,
+            len,
+            thickness,
+            1f,
+            1f,
+            angleDeg
+        );
     }
 }
