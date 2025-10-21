@@ -33,6 +33,9 @@ public class YarnSystem {
         this.probe = probe;
     }
 
+    // getters
+    public List<YarnProjectile> getProjectiles() {return projectiles;}
+
     public void shoot(Cell startCell, Direction dir) {
         YarnProjectile p = new YarnProjectile(
             grid,
