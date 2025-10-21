@@ -22,9 +22,12 @@ public class EnemyChaserMice {
         this.y = spawn.y() + 0.5f;
     }
 
+    // getters
     public Cell getCurrentCell() { return currentCell; }
     public Cell getTargetCell() { return targetCell; }
     public Direction getDirection() { return dir; }
+    public float getRenderX() { return x; }
+    public float getRenderY() { return y; }
 
     // attempt to begin a step towards the best next cell according to the pathfinder
     // this should prevent 2 enemies from moving into the same cell
