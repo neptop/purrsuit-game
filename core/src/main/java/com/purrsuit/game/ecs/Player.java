@@ -34,6 +34,8 @@ public class Player {
     // getters
     public Cell getCurrentCell() { return currentCell; }
     public Direction getDirection() { return dir; }
+    public float getRenderX() { return x; }
+    public float getRenderY() { return y; }
 
     public Player(WorldGrid grid, Cell startCell, Direction startDir, CellBlocker blocker, StepListener stepListener) {
         this.grid = grid;

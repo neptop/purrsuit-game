@@ -18,7 +18,7 @@ public class YarnProjectile {
         boolean isColliding(Cell c); // returns true if the projectile collides with something in cell c
     }
 
-    private static final float SPEED_TILES_PER_SECOND = 18f;
+    private static final float SPEED_TILES_PER_SECOND = 10f;
     private final WorldGrid grid;
     private final ImpactListener listener;
     private final CollisionProbe probe;
@@ -42,9 +42,13 @@ public class YarnProjectile {
         this.x = startCell.x() + 0.5f;
         this.y = startCell.y() + 0.5f;
     }
+
+    // getters
     public boolean isActive() { return active; } // true if still flying
     public Cell getCurrentCell() { return currentCell; }
     public Direction getDirection() { return dir; }
+    public float getRenderX() { return x; }
+    public float getRenderY() { return y; }
 
     private boolean passable(Cell c) {
         if(!grid.passable(c)) return false;

@@ -9,6 +9,10 @@ public class DoorSystem implements CellBlocker{
     private final Map<Character, List<Door>> doorsById = new HashMap<>();
     private final Map<Cell, Door> doorsByCell = new HashMap<>();
 
+    public Iterable<Door> allDoors() {
+        return doorsByCell.values();
+    }
+
     public void addDoor(Door door) {
         doorsByCell.put(door.getCell(), door);
         doorsById.computeIfAbsent(door.getId(), k -> new ArrayList<>()).add(door);

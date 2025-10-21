@@ -11,12 +11,14 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.purrsuit.game.ecs.*;
 import com.purrsuit.game.util.Cell;
 import com.purrsuit.game.util.Direction;
-import com.purrsuit.game.util.GameConfig;
 import com.purrsuit.game.io.LevelIO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.Texture;
 import com.purrsuit.game.hud.HUD;
 
 public class PlayScreen extends ScreenAdapter {
@@ -40,6 +42,9 @@ public class PlayScreen extends ScreenAdapter {
     private int levelIndex = 1;
     private DoorSystem doorSystem;
     private SwitchSystem switchSystem;
+    private AssetManager assets;
+    private TextureAtlas atlas;
+    private SpriteBatch batch;
 
     @Override
     public void show() {
@@ -55,6 +60,16 @@ public class PlayScreen extends ScreenAdapter {
         cam.update();
 
         shapes = new ShapeRenderer();
+
+        batch = new SpriteBatch();
+        assets = new AssetManager();
+        assets.load("atlas/sprites.atlas", TextureAtlas.class);
+        assets.finishLoading();
+
+        atlas = assets.get("atlas/sprites.atlas", TextureAtlas.class);
+        for (Texture t : atlas.getTextures()) {
+            t.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        }
 
         // hud
         hud = new HUD();
@@ -166,52 +181,97 @@ public class PlayScreen extends ScreenAdapter {
         }
 
         cam.update();
-        shapes.setProjectionMatrix(cam.combined);
+        shapes.setProjectionMatrix(cam.combined); // remove later
 
-        // draw grid
-        shapes.begin(ShapeRenderer.ShapeType.Line);
-        shapes.setColor(new Color(1f,1f,1f,0.12f)); // light white
+        batch.setProjectionMatrix(cam.combined);
+        batch.begin();
+
+        // draw floor
+        TextureAtlas.AtlasRegion floor = atlas.findRegion("Floor");
         for (int x = 0; x < grid.getWidth(); x++) {
             for (int y = 0; y < grid.getHeight(); y++) {
-                shapes.rect(x,y,1,1);
+                batch.draw(floor, x, y, 1f, 1f);
             }
         }
-        shapes.end();
 
         // draw walls
-        shapes.begin(ShapeRenderer.ShapeType.Filled);
-        shapes.setColor(new Color(0.8f,0.2f,0.2f,0.8f)); // semi-transparent red
+        TextureAtlas.AtlasRegion wall = atlas.findRegion("Wall");
         for (int x = 0; x < grid.getWidth(); x++) {
             for (int y = 0; y < grid.getHeight(); y++) {
-                if (grid.isWall(new com.purrsuit.game.util.Cell(x,y))) {
-                    shapes.rect(x,y,1,1);
+                if (grid.isWall(new Cell(x,y))) {
+                    batch.draw(wall, x, y, 1f, 1f);
                 }
             }
         }
 
         // draw spawners
-        shapes.setColor(new Color(0.2f, 0.6f, 1f, 0.6f));// blueish
+        TextureAtlas.AtlasRegion spawnerTex = atlas.findRegion("Spawner");
         for (Cell s : level.getSpawners()) {
-            shapes.rect(s.x(), s.y(), 1, 1);
+            batch.draw(spawnerTex, s.x(), s.y(), 1f, 1f);
         }
 
-        // draw doors and switches
-        doorSystem.render(shapes);
-        switchSystem.render(shapes);
-
         // draw start and exit
-        shapes.setColor(new Color(0.1f, 0.9f, 0.2f, 0.35f)); // start green
-        shapes.rect(level.getStart().x(), level.getStart().y(), 1, 1);
-        shapes.setColor(new Color(0.1f, 1f, 0.3f, 0.85f)); // exit red
-        shapes.rect(exitCell.x(), exitCell.y(), 1, 1);
-        shapes.end();
+        TextureAtlas.AtlasRegion startTex = atlas.findRegion("Start");
+        batch.draw(startTex, level.getStart().x(), level.getStart().y(), 1f, 1f);
+        TextureAtlas.AtlasRegion exitTex = atlas.findRegion("Exit");
+        batch.draw(exitTex, level.getExit().x(), level.getExit().y(), 1f, 1f);
 
-        // draw entities
+        // draw doors
+        TextureAtlas.AtlasRegion doorTex = atlas.findRegion("DoorUpDown");
+        for (Door d : doorSystem.allDoors()) {
+            if (!d.isOpen()) {
+                Cell dc = d.getCell();
+                batch.draw(doorTex, dc.x(), dc.y(), 1f, 1f);
+            }
+        }
+
+        // draw switches
+        TextureAtlas.AtlasRegion switchTex = atlas.findRegion("Switch");
+        for (Switch s : switchSystem.allSwitches()) {
+            Cell sc = s.getCell();
+            batch.draw(switchTex, sc.x(), sc.y(), 1f, 1f);
+        }
+
+        // regions for entities
+        TextureAtlas.AtlasRegion catTex = atlas.findRegion("Cat_idle");
+        TextureAtlas.AtlasRegion cheeseTex = atlas.findRegion("Cheese");
+        TextureAtlas.AtlasRegion mouseTex = atlas.findRegion("Mouse");
+        TextureAtlas.AtlasRegion yarnTex = atlas.findRegion("Yarn");
+        TextureAtlas.AtlasRegion tetherTex = atlas.findRegion("Tether");
+
+        // draw tether trail
+        tether.render(batch, tetherTex);
+
+        // player
+        {
+            float px = player.getRenderX() - 0.5f;
+            float py = player.getRenderY() - 0.5f;
+            batch.draw(catTex, px, py, 1f, 1f);
+        }
+
+        // enemies
+        for (EnemyChaserMice e : enemies.all()) {
+            float ex = e.getRenderX() - 0.5f;
+            float ey = e.getRenderY() - 0.5f;
+            batch.draw(mouseTex, ex, ey, 1f, 1f);
+        }
+
+        // yarn projectiles
+        for (YarnProjectile y : yarns.getProjectiles()) {
+            float tipX = y.getRenderX() + 0.35f * y.getDirection().dx;
+            float tipY = y.getRenderY() + 0.35f * y.getDirection().dy;
+            batch.draw(yarnTex, tipX - 0.25f, tipY - 0.25f, 0.5f, 0.5f);
+        }
+
+        // tethered cheese
+        Cell cheeseCell = tether.getCheeseCell();
+        if (cheeseCell != null) {
+            batch.draw(cheeseTex, cheeseCell.x(), cheeseCell.y(), 1f, 1f);
+        }
+
+        batch.end();
+
         shapes.begin(ShapeRenderer.ShapeType.Filled);
-        tether.render(shapes);
-        yarns.render(shapes);
-        enemies.render(shapes);
-        player.render(shapes);
 
         // if you win, draw overlay
         if (win) {
@@ -241,6 +301,12 @@ public class PlayScreen extends ScreenAdapter {
         shapes.dispose();
         if (hud != null){
             hud.dispose();
+        }
+        if (assets != null){
+            assets.dispose();
+        }
+        if (batch != null) {
+            batch.dispose();
         }
     }
 }

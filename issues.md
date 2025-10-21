@@ -8,9 +8,9 @@
 - **[6]** Basic UI and HUD
 - **[7]** Switches and doors
 - **[8]** Complete tutorial level
+- **[9]** Add in art assets
 
 ## Open Issues ##
-- **[9]** Add in art assets
 - **[10]** Add power-ups
 - **[11]** More levels
 - **[12]** Main menu
