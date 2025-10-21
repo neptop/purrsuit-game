@@ -18,7 +18,7 @@ public class YarnProjectile {
         boolean isColliding(Cell c); // returns true if the projectile collides with something in cell c
     }
 
-    private static final float SPEED_TILES_PER_SECOND = 18f;
+    private static final float SPEED_TILES_PER_SECOND = 10f;
     private final WorldGrid grid;
     private final ImpactListener listener;
     private final CollisionProbe probe;
