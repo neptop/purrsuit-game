@@ -5,9 +5,17 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.purrsuit.game.ecs.*;
 import com.purrsuit.game.util.Cell;
 import com.purrsuit.game.util.Direction;
@@ -18,12 +26,15 @@ import java.util.Map;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.Texture;
 import com.purrsuit.game.hud.HUD;
+import com.purrsuit.game.PurrsuitGame;
 
 public class PlayScreen extends ScreenAdapter {
 
     // fields
+    private PurrsuitGame game;
     private OrthographicCamera cam;
     private FitViewport viewport;
     private ShapeRenderer shapes;
@@ -49,6 +60,125 @@ public class PlayScreen extends ScreenAdapter {
     private List<PowerUpPickup> pickups;
     private CoinSystem coins;
     private static final int REQUIRED_COINS = 3; // coins needed to exit level
+    private enum PlayState{
+        PLAYING,
+        WON,
+        GAMEOVER
+    }
+    private PlayState currentState = PlayState.PLAYING;
+    private Stage overlayStage;
+    private Skin overlaySkin;
+    private Texture overlayWhite;
+    private boolean overlayBuilt = false; // avoid rebuilding on every frame
+    private boolean hasNextLevel = false;
+
+    public PlayScreen(PurrsuitGame game, int levelIndex) {
+        this.game = game;
+        this.levelIndex = levelIndex;
+    }
+
+    private Texture makeWhiteTex() {
+        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        pixmap.setColor(Color.WHITE);
+        pixmap.fill();
+        Texture texture = new Texture(pixmap);
+        pixmap.dispose();
+        return texture;
+    }
+
+    private Skin buildOverlaySkin(Texture white) {
+        Skin s = new Skin();
+        s.add("white", white, Texture.class);
+
+        // label style
+        BitmapFont f = new BitmapFont();
+        f.getData().setScale(1.6f);
+        s.add("titleFont", f);
+        Label.LabelStyle ls = new Label.LabelStyle();
+        ls.font = f;
+        ls.fontColor = Color.WHITE;
+        s.add("title", ls);
+
+        // button style
+        BitmapFont bf = new BitmapFont();
+        s.add("font", bf);
+        Drawable up = new TextureRegionDrawable(new TextureRegion(white)).tint(new Color(0.18f,0.18f,0.18f,1f));
+        Drawable down = new TextureRegionDrawable(new TextureRegion(white)).tint(new Color(0.28f,0.28f,0.28f,1f));
+        Drawable over = new TextureRegionDrawable(new TextureRegion(white)).tint(new Color(0.22f,0.22f,0.22f,1f));
+        TextButton.TextButtonStyle tbs = new TextButton.TextButtonStyle(up, down, over, bf);
+        tbs.fontColor = Color.WHITE;
+        s.add("default", tbs);
+        return s;
+    }
+
+    private void showGameOverOverlay(){
+        if (overlayBuilt) return;
+        overlayBuilt = true;
+        currentState = PlayState.GAMEOVER;
+
+        Gdx.input.setInputProcessor(overlayStage);
+
+        // transparent background
+        Image veil = new Image(new TextureRegionDrawable(new TextureRegion(overlayWhite)));
+        veil.setColor(new Color(0f,0f,0f,0.6f));
+        veil.setFillParent(true);
+        overlayStage.addActor(veil);
+
+        // ui table
+        Table root = new Table();
+        root.setFillParent(true);
+        root.center();
+        overlayStage.addActor(root);
+
+        Label title = new Label("Game Over", overlaySkin, "title");
+        TextButton back = new TextButton("Return to Main Menu", overlaySkin);
+        back.addListener(e -> {
+            if (!back.isPressed()) return false;
+            game.setScreen(new MainMenuScreen(game));
+            return true;
+        });
+
+        root.defaults().pad(12f);
+        root.add(title).padTop(18f).row();
+        root.add(back).width(240f).height(56f);
+    }
+
+    private void showVictoryOverlay(){
+        if (overlayBuilt) return;
+        overlayBuilt = true;
+        currentState = PlayState.WON;
+
+        Gdx.input.setInputProcessor(overlayStage);
+
+        // transparent background
+        Image veil = new Image(new TextureRegionDrawable(new TextureRegion(overlayWhite)));
+        veil.setColor(new Color(0f,0f,0f,0.6f));
+        veil.setFillParent(true);
+        overlayStage.addActor(veil);
+
+        // ui table
+        Table root = new Table();
+        root.setFillParent(true);
+        root.center();
+        overlayStage.addActor(root);
+
+        Label title = new Label("Level Cleared", overlaySkin, "title");
+        String buttonText = hasNextLevel ? "Next Level" : "Return to Main Menu";
+        TextButton action = new TextButton(buttonText, overlaySkin);
+        action.addListener(e -> {
+            if (!action.isPressed()) return false;
+            if (hasNextLevel) {
+                game.setScreen(new PlayScreen(game, levelIndex + 1));
+            } else {
+                game.setScreen(new MainMenuScreen(game));
+            }
+            return true;
+        });
+
+        root.defaults().pad(12f);
+        root.add(title).padTop(18f).row();
+        root.add(action).width(240f).height(56f);
+    }
 
     @Override
     public void show() {
@@ -56,6 +186,11 @@ public class PlayScreen extends ScreenAdapter {
         level = LevelIO.load("levels/Level1.txt");
         grid = level.getGrid();
         exitCell = level.getExit();
+
+        // init overlay
+        overlayStage = new Stage(new ScreenViewport());
+        overlayWhite = makeWhiteTex();
+        overlaySkin = buildOverlaySkin(overlayWhite);
 
         // setup camera/viewport
         cam = new OrthographicCamera();
@@ -159,22 +294,25 @@ public class PlayScreen extends ScreenAdapter {
         Gdx.gl.glClearColor(0.08f, 0.08f, 0.1f, 1f); // dark blueish
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT); // clear the screen
 
-        powerUps.update(delta);
-        // pickup lifecycle and collection
-        for (int i = pickups.size() - 1; i >= 0; i--) {
-            PowerUpPickup p = pickups.get(i);
-            p.update(delta);
-            if (!p.isAlive()) {
-                pickups.remove(i);
-                continue;
-            }
-            if (p.getCell().equals(player.getCurrentCell())) {
-                powerUps.grant(p.getType());
-                pickups.remove(i);
-            }
-        }
 
-        if (!win){
+        // update only if running
+        if (currentState == PlayState.PLAYING) {
+            powerUps.update(delta);
+            // pickup lifecycle and collection
+            for (int i = pickups.size() - 1; i >= 0; i--) {
+                PowerUpPickup p = pickups.get(i);
+                p.update(delta);
+                if (!p.isAlive()) {
+                    pickups.remove(i);
+                    continue;
+                }
+                if (p.getCell().equals(player.getCurrentCell())) {
+                    powerUps.grant(p.getType());
+                    pickups.remove(i);
+                }
+            }
+
+
             player.update(delta);
             coins.collect(player.getCurrentCell());
 
@@ -202,10 +340,15 @@ public class PlayScreen extends ScreenAdapter {
                 enemies.update(delta, cheeseCell, now, aim, tether);
             }
 
-            if (now.equals(exitCell)){
+            if (tether.isNotActive()) {
+                showGameOverOverlay();
+            }
+
+            if (currentState == PlayState.PLAYING && now.equals(exitCell)) {
                 int required = Math.min(REQUIRED_COINS, coins.getTotalCoins());
-                if(coins.getCollectedCoins() >= required) {
-                    win = true;
+                if (coins.getCollectedCoins() >= required) {
+                    hasNextLevel = Gdx.files.internal("levels/Level" + (levelIndex + 1) + ".txt").exists();
+                    showVictoryOverlay();
                 }
             }
         }
@@ -312,22 +455,16 @@ public class PlayScreen extends ScreenAdapter {
 
         batch.end();
 
-        shapes.begin(ShapeRenderer.ShapeType.Filled);
-
-        // if you win, draw overlay
-        if (win) {
-            shapes.setColor(new Color(0f, 0f, 0f, 0.6f));
-            shapes.rect(0,0,grid.getWidth(), grid.getHeight());
-            shapes.setColor(new Color(1f,0.95f,0.2f,1f));
-            shapes.circle(exitCell.x()+0.5f, exitCell.y()+0.5f, 0.5f, 24); // sparkles
-        }
-        shapes.end();
-
         // draw hud
         hud.setCheeseHp(tether.getCurrentHp(), tether.getMaxHp());
         hud.setLevelNumber(levelIndex);
         hud.setCatnipTimer(powerUps.isCatnipActive(), powerUps.getCatnipTimeRemaining(), PowerUpSystem.CATNIP_DURATION);
         hud.render();
+
+        if (currentState != PlayState.PLAYING) {
+            overlayStage.act(delta);
+            overlayStage.draw();
+        }
     }
 
     @Override
@@ -335,6 +472,9 @@ public class PlayScreen extends ScreenAdapter {
         viewport.update(width, height, true);
         if(hud != null){
             hud.resize(width, height);
+        }
+        if(overlayStage != null){
+            overlayStage.getViewport().update(width, height, true);
         }
     }
 
@@ -349,6 +489,15 @@ public class PlayScreen extends ScreenAdapter {
         }
         if (batch != null) {
             batch.dispose();
+        }
+        if (overlayStage != null){
+            overlayStage.dispose();
+        }
+        if (overlayWhite != null) {
+            overlayWhite.dispose();
+        }
+        if (overlaySkin != null){
+            overlaySkin.dispose();
         }
     }
 }

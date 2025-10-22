@@ -53,7 +53,7 @@ public class MainMenuScreen extends ScreenAdapter {
         // add listeners
         playButton.addListener(e -> {
             if(!playButton.isPressed()) return false; // only trigger on press
-            game.setScreen(new PlayScreen());
+            game.setScreen(new PlayScreen(game, 1));
             return true;
         });
 
