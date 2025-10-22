@@ -10,13 +10,12 @@
 - **[8]** Complete tutorial level
 - **[9]** Add in art assets
 - **[10]** Add power-ups
+- **[11]** collectible coins require to clear level
+- **[12]** Main menu
 
 ## Open Issues ##
-- **[11]** collectible coins require to clear level
-- **[12]** More levels
-- **[13]** Main menu
-- **[14]** Pause menu
-- **[15]** Game over screen
-- **[16]** Victory screen
-- **[17]** Cheat codes/cheat menu
+- **[13]** How to play/instructions screen
+- **[14]** Game over screen & Victory Screen
+- **[15]** More levels
+- **[16]** Cheat codes/cheat menu
 
