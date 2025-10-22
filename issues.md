@@ -9,13 +9,14 @@
 - **[7]** Switches and doors
 - **[8]** Complete tutorial level
 - **[9]** Add in art assets
+- **[10]** Add power-ups
 
 ## Open Issues ##
-- **[10]** Add power-ups
-- **[11]** More levels
-- **[12]** Main menu
-- **[13]** Pause menu
-- **[14]** Game over screen
-- **[15]** Victory screen
-- **[16]** Sound effects
+- **[11]** collectible coins require to clear level
+- **[12]** More levels
+- **[13]** Main menu
+- **[14]** Pause menu
+- **[15]** Game over screen
+- **[16]** Victory screen
+- **[17]** Cheat codes/cheat menu
 
