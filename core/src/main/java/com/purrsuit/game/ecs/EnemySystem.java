@@ -48,6 +48,17 @@ public class EnemySystem {
         return removed;
     }
 
+    public int killAllEnemies(Consumer<Cell> onEachKilled) {
+        int count = enemies.size();
+        for (EnemyChaserMice e : enemies) {
+            if (onEachKilled != null){
+                onEachKilled.accept(e.getCurrentCell()); // drops catnip on impact cell
+            }
+        }
+        enemies.clear();
+        return count;
+    }
+
 
     public boolean rollCatnip(){
         return random.nextFloat() < CATNIP_DROP_CHANCE;

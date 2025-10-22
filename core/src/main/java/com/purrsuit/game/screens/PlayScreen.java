@@ -28,6 +28,8 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.Input.Keys;
+import com.purrsuit.game.debug.CheatConsole;
 import com.purrsuit.game.hud.HUD;
 import com.purrsuit.game.PurrsuitGame;
 
@@ -71,10 +73,100 @@ public class PlayScreen extends ScreenAdapter {
     private Texture overlayWhite;
     private boolean overlayBuilt = false; // avoid rebuilding on every frame
     private boolean hasNextLevel = false;
+    private CheatConsole console;
 
     public PlayScreen(PurrsuitGame game, int levelIndex) {
         this.game = game;
         this.levelIndex = levelIndex;
+    }
+
+    public void executeCheat(String raw) {
+        String line = raw.trim();
+        if (line.isEmpty()) return;
+
+        String lower = line.toLowerCase();
+
+        // help command
+        if (lower.equals("help")) {
+            console.print("Available commands:\n");
+            console.print("  god               - cheese takes no damage\n");
+            console.print("  level -<n>        - jump to n level (e.g. level -3\n");
+            console.print("  clear             - Instantly win the level\n");
+            console.print("  lose              - Instantly lose the level\n");
+            console.print("  give catnip       - Grant catnip power-up 1 int front (if open)\n");
+            console.print("  killall           - Remove all enemies\n");
+            console.print("  help              - show this list\n");
+            return;
+        }
+
+        // god mode
+        if (lower.equals("god")) {
+            tether.setInvulnerable(true);
+            console.print("Godmode: ON\n");
+            return;
+        }
+
+        // level -n
+        if (lower.startsWith("level -")) {
+            try {
+                int n = Integer.parseInt(lower.substring("level -".length()).trim());
+                if (n <= 0) throw new NumberFormatException();
+                // check if level exists
+                boolean exists = Gdx.files.internal("levels/Level" + n + ".txt").exists();
+                if (!exists) {
+                    console.print("Level " + n + " does not exist.\n");
+                    return;
+                }
+                game.setScreen(new PlayScreen(game, n));
+            } catch (NumberFormatException e) {
+                console.print("Invalid level number.\n");
+            }
+            return;
+        }
+
+        // clear
+        if (lower.equals("clear")) {
+            hasNextLevel = Gdx.files.internal("levels/Level" + (levelIndex + 1) + ".txt").exists();
+            showVictoryOverlay();
+            console.print("Level Cleared!\n");
+            return;
+        }
+
+        // lose
+        if (lower.equals("lose")) {
+            showGameOverOverlay();
+            console.print("Game Over!\n");
+            return;
+        }
+
+        // give catnip
+        if (lower.equals("give catnip")) {
+            Cell here = player.getCurrentCell();
+            Direction dir = player.getDirection();
+            if (dir == null) dir = Direction.UP;
+            Cell ahead = here.next(dir);
+
+            boolean open = grid.passable(ahead) && (doorSystem == null || !doorSystem.isBlocked(ahead))
+                && !enemies.hasEnemyAt(ahead)
+                && !tether.blocks(ahead);
+            if (open) {
+                pickups.add(new PowerUpPickup(PowerUpType.CATNIP, ahead, 20f));
+                console.print("Catnip power-up granted in front of player.\n");
+            } else {
+                console.print("Cannot place catnip there. Space is blocked.\n");
+            }
+            return;
+        }
+
+        // killall
+        if (lower.equals("killall")) {
+            int removed = enemies.killAllEnemies(null);
+            console.print("Removed " + removed + " enemies.\n");
+            return;
+        }
+
+        // unknown command
+        console.print("Unknown command, type 'help' for list of commands.\n");
     }
 
     private Texture makeWhiteTex() {
@@ -213,6 +305,12 @@ public class PlayScreen extends ScreenAdapter {
         // hud
         hud = new HUD();
 
+        // cheat console
+        console = new CheatConsole();
+        console.setExecutor(this::executeCheat);
+        console.print("Cheat Console Initialized.\nType 'help' for commands.\n");
+
+
         // door and switch systems
         doorSystem = new DoorSystem();
         switchSystem = new SwitchSystem();
@@ -294,9 +392,20 @@ public class PlayScreen extends ScreenAdapter {
         Gdx.gl.glClearColor(0.08f, 0.08f, 0.1f, 1f); // dark blueish
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT); // clear the screen
 
+        if(Gdx.input.isKeyJustPressed(Keys.F1) || Gdx.input.isKeyJustPressed(Keys.GRAVE)) {
+            if (console.isVisible()) {
+                console.hide();
+                if (currentState != PlayState.PLAYING && overlayStage != null) {
+                    Gdx.input.setInputProcessor(overlayStage); // game input
+                }
+            } else {
+                console.show();
+            }
+        }
 
         // update only if running
         if (currentState == PlayState.PLAYING) {
+
             powerUps.update(delta);
             // pickup lifecycle and collection
             for (int i = pickups.size() - 1; i >= 0; i--) {
@@ -464,6 +573,11 @@ public class PlayScreen extends ScreenAdapter {
         if (currentState != PlayState.PLAYING) {
             overlayStage.act(delta);
             overlayStage.draw();
+        }
+
+        // draw console
+        if(console != null && console.isVisible()){
+            console.render(delta);
         }
     }
 
