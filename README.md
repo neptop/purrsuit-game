@@ -1,33 +1,69 @@
-# YourProjectName
+# Purrsuit
 
-A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://github.com/libgdx/gdx-liftoff).
+Purrsuuit is an Arcade-puzzler built with libGdx. Control a speedy cat while protecting a tether block of cheese that you stole from a colony of hungry mice.
+Toggle doors with switches, collect coins, and pickup catnip that drop from mice for a power up.
+Currently only 3 levels are playable.
 
-This project was generated with a template including simple application launchers and an `ApplicationAdapter` extension that draws libGDX logo.
+## Controls
 
-## Platforms
+- W/A/S/D - move
+- Space - shoot yarn
+- F1 or ~ (tilde) - toggle cheat console
+- Mouse - UI only
+  
+## Cheat Console Commands
+- 'help' - list all commands
+- 'god' - cheese becomes invulnernable to all damage
+- 'level -<n> - jump to level n (ex. 'level -3' jumps to level 3)
+- 'give catnip' - spawn a catnip power up 1 tile in front of the player if the space is open
+- 'killall' - remove all enemies currently on the map
+- 'clear' - instantly win the level
+- 'lose' - instanly trigger game over screen
 
-- `core`: Main module with the application logic shared by all platforms.
-- `lwjgl3`: Primary desktop platform using LWJGL3; was called 'desktop' in older docs.
+## Original Low-Bars & Completion Status
+- Grid Movement + No U-turn restriction - Complete
+- Tethered Cheese with tile offset - Complete
+- Cheese HP and Collision detection - Complete
+- Yarn Ball Projectile Attack - Complete
+- Catnip Powerup - Complete
+- Chaser Mice - Complete
+- Dijkstra pathfinding + Heat map around player - Complete
+- Sentry/Patrolling Mice - Incomplete
+- Interactives (switches, doors, pressure plate) - Partially Complete
+- At least 2 well through out levels - Complete
+- HUD - Complete
+- Console cheats- Complete
 
-## Gradle
+## High-Bars & Completion Status
+- Ambusher Enemy - Incomplete
+- Projectile attack upgrades - Incomplete
+- Additional Puzzle Elements - Partially Complete
+- Conveyor Belt Tiles - Incomplete
+- Crumbling tiles - Incomplete
+- Final Boss Puzzle - Incomplete
 
-This project uses [Gradle](https://gradle.org/) to manage dependencies.
-The Gradle wrapper was included, so you can run Gradle tasks using `gradlew.bat` or `./gradlew` commands.
-Useful Gradle tasks and flags:
+## License
 
-- `--continue`: when using this flag, errors will not stop the tasks from running.
-- `--daemon`: thanks to this flag, Gradle daemon will be used to run chosen tasks.
-- `--offline`: when using this flag, cached dependency archives will be used.
-- `--refresh-dependencies`: this flag forces validation of all dependencies. Useful for snapshot versions.
-- `build`: builds sources and archives of every project.
-- `cleanEclipse`: removes Eclipse project data.
-- `cleanIdea`: removes IntelliJ project data.
-- `clean`: removes `build` folders, which store compiled classes and built archives.
-- `eclipse`: generates Eclipse project data.
-- `idea`: generates IntelliJ project data.
-- `lwjgl3:jar`: builds application's runnable jar, which can be found at `lwjgl3/build/libs`.
-- `lwjgl3:run`: starts the application.
-- `test`: runs unit tests (if any).
+MIT License
 
-Note that most tasks that are not specific to a single project can be run with `name:` prefix, where the `name` should be replaced with the ID of a specific project.
-For example, `core:clean` removes `build` folder only from the `core` project.
+Copyright (c) 2025 David Hoang
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+  
