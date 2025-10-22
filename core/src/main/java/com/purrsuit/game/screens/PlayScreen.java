@@ -45,6 +45,8 @@ public class PlayScreen extends ScreenAdapter {
     private AssetManager assets;
     private TextureAtlas atlas;
     private SpriteBatch batch;
+    private PowerUpSystem powerUps;
+    private List<PowerUpPickup> pickups;
 
     @Override
     public void show() {
@@ -106,18 +108,22 @@ public class PlayScreen extends ScreenAdapter {
             doorSystem
         );
 
+        powerUps = new PowerUpSystem();
+        pickups = new ArrayList<>();
+
         // spawn player pass in composite blocker
-        player = new Player(grid, level.getStart(), Direction.RIGHT, compositeBlocker, new StepListener() {
+        player = new Player(grid, level.getStart(), Direction.RIGHT, compositeBlocker, new StepListener(){
             @Override
             public void onEnter(Cell cell){
                 tether.onHeadMoved(cell);
             }
-        });
+        }, powerUps
+        );
 
         yarns = new YarnSystem(grid);
         yarns.setBlocker(compositeBlocker);
 
-        enemies = new EnemySystem(grid, doorSystem);
+        enemies = new EnemySystem(grid, doorSystem, powerUps);
         spawners = new ArrayList<EnemySpawner>();
         for (Cell spawnerCell : level.getSpawners()) {
             spawners.add(new EnemySpawner(spawnerCell, 5f));
@@ -130,15 +136,15 @@ public class PlayScreen extends ScreenAdapter {
             }
         });
 
-        yarns.setImpactHook(new YarnSystem.ImpactHook() {
-            @Override
-            public void onImpact(Cell impactCell, Direction dir) {
-                enemies.killEnemiesAt(impactCell);
-
-                Character sid = switchSystem.getSwitchIdAt(impactCell);
-                if (sid != null) {
-                    boolean opened = doorSystem.toggleDoors(sid.charValue());
+        yarns.setImpactHook((impactCell, dir) -> {
+            enemies.killEnemiesAt(impactCell, catnipCell -> {
+                if (enemies.rollCatnip()) {
+                    pickups.add(new PowerUpPickup(PowerUpType.CATNIP, catnipCell, 15f));
                 }
+            });
+            Character sid = switchSystem.getSwitchIdAt(impactCell);
+            if (sid != null) {
+                boolean opened = doorSystem.toggleDoors(sid.charValue());
             }
         });
     }
@@ -147,6 +153,21 @@ public class PlayScreen extends ScreenAdapter {
     public void render (float delta) {
         Gdx.gl.glClearColor(0.08f, 0.08f, 0.1f, 1f); // dark blueish
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT); // clear the screen
+
+        powerUps.update(delta);
+        // pickup lifecycle and collection
+        for (int i = pickups.size() - 1; i >= 0; i--) {
+            PowerUpPickup p = pickups.get(i);
+            p.update(delta);
+            if (!p.isAlive()) {
+                pickups.remove(i);
+                continue;
+            }
+            if (p.getCell().equals(player.getCurrentCell())) {
+                powerUps.grant(p.getType());
+                pickups.remove(i);
+            }
+        }
 
         if (!win){
             player.update(delta);
@@ -238,6 +259,7 @@ public class PlayScreen extends ScreenAdapter {
         TextureAtlas.AtlasRegion mouseTex = atlas.findRegion("Mouse");
         TextureAtlas.AtlasRegion yarnTex = atlas.findRegion("Yarn");
         TextureAtlas.AtlasRegion tetherTex = atlas.findRegion("Tether");
+        TextureAtlas.AtlasRegion catnipTex = atlas.findRegion("Catnip");
 
         // draw tether trail
         tether.render(batch, tetherTex);
@@ -267,6 +289,13 @@ public class PlayScreen extends ScreenAdapter {
         Cell cheeseCell = tether.getCheeseCell();
         if (cheeseCell != null) {
             batch.draw(cheeseTex, cheeseCell.x(), cheeseCell.y(), 1f, 1f);
+        }
+
+        // power-ups
+        for (PowerUpPickup p : pickups) {
+            if (p.getType() == PowerUpType.CATNIP) {
+                p.render(batch, catnipTex);
+            }
         }
 
         batch.end();
