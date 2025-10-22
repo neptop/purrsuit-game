@@ -183,7 +183,7 @@ public class PlayScreen extends ScreenAdapter {
     @Override
     public void show() {
         // load level from ASCII map
-        level = LevelIO.load("levels/Level1.txt");
+        level = LevelIO.load("levels/Level" + levelIndex + ".txt");
         grid = level.getGrid();
         exitCell = level.getExit();
 
@@ -272,7 +272,7 @@ public class PlayScreen extends ScreenAdapter {
         yarns.setCollisionProbe(new YarnSystem.CollisionProbe() {
             @Override
             public boolean isColliding(Cell cell) {
-                return enemies.hasEnemyAt(cell);
+                return enemies.hasEnemyAt(cell) || switchSystem.getSwitchIdAt(cell) != null;
             }
         });
 
