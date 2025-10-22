@@ -272,7 +272,7 @@ public class PlayScreen extends ScreenAdapter {
         yarns.setCollisionProbe(new YarnSystem.CollisionProbe() {
             @Override
             public boolean isColliding(Cell cell) {
-                return enemies.hasEnemyAt(cell);
+                return enemies.hasEnemyAt(cell) || switchSystem.getSwitchIdAt(cell) != null;
             }
         });
 
