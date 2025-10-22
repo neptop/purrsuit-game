@@ -314,6 +314,7 @@ public class PlayScreen extends ScreenAdapter {
         // draw hud
         hud.setCheeseHp(tether.getCurrentHp(), tether.getMaxHp());
         hud.setLevelNumber(levelIndex);
+        hud.setCatnipTimer(powerUps.isCatnipActive(), powerUps.getCatnipTimeRemaining(), PowerUpSystem.CATNIP_DURATION);
         hud.render();
     }
 
