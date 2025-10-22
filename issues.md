@@ -12,10 +12,10 @@
 - **[10]** Add power-ups
 - **[11]** collectible coins require to clear level
 - **[12]** Main menu
-
-## Open Issues ##
 - **[13]** How to play/instructions screen
 - **[14]** Game over screen & Victory Screen
+
+## Open Issues ##
 - **[15]** More levels
 - **[16]** Cheat codes/cheat menu
 
