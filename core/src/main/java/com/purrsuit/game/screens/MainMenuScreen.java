@@ -1,7 +1,6 @@
 package com.purrsuit.game.screens;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -59,8 +58,9 @@ public class MainMenuScreen extends ScreenAdapter {
         });
 
         howToPlayButton.addListener(e -> {
-           if (!howToPlayButton.isPressed()) return false;
-           return true; // do nothing for now
+            if (!howToPlayButton.isPressed()) return false;
+            game.setScreen(new HowToPlayScreen(game));
+            return true; // do nothing for now
         });
 
         exitButton.addListener(e -> {
