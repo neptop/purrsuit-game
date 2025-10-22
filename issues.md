@@ -14,8 +14,8 @@
 - **[12]** Main menu
 - **[13]** How to play/instructions screen
 - **[14]** Game over screen & Victory Screen
-
-## Open Issues ##
 - **[15]** More levels
 - **[16]** Cheat codes/cheat menu
+
+## Open Issues ##
 
