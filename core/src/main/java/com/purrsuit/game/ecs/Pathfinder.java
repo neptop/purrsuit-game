@@ -28,6 +28,7 @@ public class Pathfinder {
 
     private boolean passable(Cell c){
         if(!grid.inBounds(c)) return false;
+        if(grid.isWall(c)) return false;
         if(blocker != null && blocker.isBlocked(c)) return false;
         return true;
     }
@@ -67,8 +68,10 @@ public class Pathfinder {
             for (Direction dir : dirs) {
                 int nx = n.x + dir.dx;
                 int ny = n.y + dir.dy;
+                Cell nextCell = new Cell(nx, ny);
                 if (nx < 0 || nx >= width || ny < 0 || ny >= height) continue; // out of bounds
-                if (grid.isWall(new Cell(nx, ny))) continue; // wall
+                if (!passable(nextCell)) continue; // not passable
+
 
                 float newCost = n.cost + 1f + heat.getHeat(nx, ny); // base cost 1 + heat penalty
                 if (newCost < dist[nx][ny]) {
@@ -95,5 +98,23 @@ public class Pathfinder {
             }
         }
         return bestDir; // may be null if no valid steps
+    }
+
+    public Direction worstStep(Cell fromCell){
+        float worst = Float.NEGATIVE_INFINITY;
+        Direction worstDir = null;
+        for (Direction dir : dirs) {
+            int nx = fromCell.x() + dir.dx;
+            int ny = fromCell.y() + dir.dy;
+            Cell nextCell = new Cell(nx, ny);
+            if (!passable(nextCell)) continue; // not passable
+
+            if (Float.isInfinite(dist[nx][ny])) continue; // unreachable cell
+            if (dist[nx][ny] > worst) {
+                worst = dist[nx][ny];
+                worstDir = dir;
+            }
+        }
+        return worstDir; // may be null if no valid steps
     }
 }
