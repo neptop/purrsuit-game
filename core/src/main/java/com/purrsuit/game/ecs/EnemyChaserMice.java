@@ -31,9 +31,9 @@ public class EnemyChaserMice {
 
     // attempt to begin a step towards the best next cell according to the pathfinder
     // this should prevent 2 enemies from moving into the same cell
-    public boolean tryBeginStep(Pathfinder pf, java.util.Set<Cell> reserved){
+    public boolean tryBeginStep(Pathfinder pf, java.util.Set<Cell> reserved, boolean flee){
         if (targetCell != null) return true; // already moving
-        Direction nextDir = pf.bestStep(currentCell);
+        Direction nextDir = flee ? pf.worstStep(currentCell) : pf.bestStep(currentCell);
         if (nextDir == null) return false; // no valid step
         Cell nextCell = currentCell.next(nextDir);
         if (reserved.contains(nextCell)) return false; // cell is reserved
@@ -43,13 +43,17 @@ public class EnemyChaserMice {
         return true;
     }
 
-    public void update(float delta, Pathfinder pf){
+    public void update(float delta, Pathfinder pf, boolean flee){
         if (targetCell == null) {
-            Direction nextDir = pf.bestStep(currentCell);
+            Direction nextDir = flee ? pf.worstStep(currentCell) : pf.bestStep(currentCell);
             if (nextDir != null) {
                 dir = nextDir;
                 targetCell = currentCell.next(dir);
                 t = 0f;
+            } else {
+                x = currentCell.x() + 0.5f;
+                y = currentCell.y() + 0.5f;
+                return; // no valid step
             }
         }
         t += delta * SPEED;

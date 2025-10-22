@@ -3,6 +3,8 @@ package com.purrsuit.game.ecs;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Iterator;
+import java.util.Random;
+import java.util.function.Consumer;
 import com.purrsuit.game.util.Cell;
 import com.purrsuit.game.util.Direction;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -12,11 +14,15 @@ public class EnemySystem {
     private final Pathfinder path;
     private final HeatField heat;
     private final List<EnemyChaserMice> enemies = new ArrayList<>();
+    private final PowerUpSystem powerUps;
+    private final float CATNIP_DROP_CHANCE = 0.10f ; // 10% chance to drop catnip on death
+    private final Random random = new Random();
 
-    public EnemySystem(WorldGrid grid, CellBlocker blocker) {
+    public EnemySystem(WorldGrid grid, CellBlocker blocker, PowerUpSystem powerUps) {
         this.grid = grid;
         this.path = new Pathfinder(grid, blocker);
         this.heat = new HeatField(grid.getWidth(), grid.getHeight());
+        this.powerUps = powerUps;
     }
 
     public boolean hasEnemyAt(Cell c) {
@@ -26,13 +32,25 @@ public class EnemySystem {
         return false;
     }
 
-    public void killEnemiesAt(Cell c) {
+    public int killEnemiesAt(Cell c, Consumer<Cell> onEachKilled) {
+        int removed = 0;
         Iterator<EnemyChaserMice> iter = enemies.iterator();
         while (iter.hasNext()) {
-            if (iter.next().getCurrentCell().equals(c)) {
+            EnemyChaserMice e = iter.next();
+            if (e.getCurrentCell().equals(c)) {
                 iter.remove();
+                removed++;
+                if (onEachKilled != null){
+                    onEachKilled.accept(c); // drops catnip on impact cell
+                }
             }
         }
+        return removed;
+    }
+
+
+    public boolean rollCatnip(){
+        return random.nextFloat() < CATNIP_DROP_CHANCE;
     }
 
     // spawn an enemy at cell c if passable
@@ -52,6 +70,7 @@ public class EnemySystem {
         // dijkstra from cheese with heat penalties
         path.computeDist(cheese, heat);
 
+        boolean flee = powerUps != null && powerUps.isCatnipActive();
 
         // reserve cells to prevent enemies from colliding
         java.util.Set<Cell> reserved = new java.util.HashSet<>();
@@ -67,7 +86,7 @@ public class EnemySystem {
         // try beginstep for each enemy
         for (EnemyChaserMice e : enemies) {
             if(e.getTargetCell() == null){
-                if(e.tryBeginStep(path, reserved)){
+                if(e.tryBeginStep(path, reserved, flee)){
                     Cell target = e.getTargetCell();
                     if (target != null) {
                         reserved.add(target);
@@ -78,7 +97,7 @@ public class EnemySystem {
 
         // update enemies pos
         for (EnemyChaserMice e : enemies) {
-            e.update(delta, path);
+            e.update(delta, path, flee);
         }
 
         // collisions

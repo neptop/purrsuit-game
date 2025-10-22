@@ -21,6 +21,9 @@ public class HUD {
     private int currentHp = 3;
     private int maxHp = 3;
     private int levelNumber = 1;
+    private boolean catnipActive = false;
+    private float catnipRemaining = 0f;
+    private float catnipMax = 0f;
 
     // config in pixels
     private static final float PADDING = 12f;
@@ -28,18 +31,25 @@ public class HUD {
     private static final float DOT_SPACING = 26f; // center to center
 
     public HUD(){
-        font.getData().setScale(1f);
+        font.getData().setScale(1.6f);
+    }
+
+    // setters
+    public void setCatnipTimer(boolean active, float remaining, float max){
+        this.catnipActive = active;
+        this.catnipRemaining = Math.max(0f, remaining);
+        this.catnipMax = Math.max(0.1f, max);
     }
 
     public void setCheeseHp(int current, int max){
-        this.currentHp = Math.max(0, Math.min(current, this.maxHp)); // clamp to [0, maxHp]
         this.maxHp = Math.max(1, max);
+        this.currentHp = Math.max(0, Math.min(current, this.maxHp)); // clamp to [0, maxHp]
     }
-
     public void setLevelNumber(int levelNumber){
         this.levelNumber = Math.max(1, levelNumber);
     }
 
+    // call on window resize
     public void resize(int width, int height){
         uiViewport.update(width, height, true);
     }
@@ -65,6 +75,22 @@ public class HUD {
             }
         }
         shapes.end();
+
+        batch.setProjectionMatrix(uiCam.combined);
+
+        // draw catnip timer
+        if (catnipActive){
+            String text = String.format("Catnip: %.1f s", catnipRemaining);
+            layout.setText(font, text);
+
+            float marginTop = 8f;
+            float x = (uiViewport.getScreenWidth() - layout.width) / 2f;
+            float yTxt = uiViewport.getScreenHeight() - marginTop;
+
+            batch.begin();
+            font.draw(batch, text, x, yTxt);
+            batch.end();
+        }
 
         // draw level number on top-right
         String txt = "Level " + levelNumber;
