@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
@@ -16,15 +17,16 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.purrsuit.game.PurrsuitGame;
 
-public class MainMenuScreen extends ScreenAdapter {
+public class HowToPlayScreen extends ScreenAdapter {
     private final PurrsuitGame game;
     private Stage stage;
     private ScreenViewport viewport;
     private Skin skin;
     private BitmapFont font;
+    private BitmapFont titleFont;
     private Texture whiteTex;
 
-    public MainMenuScreen(PurrsuitGame game) {
+    public HowToPlayScreen(PurrsuitGame game) {
         this.game = game;
     }
 
@@ -33,65 +35,68 @@ public class MainMenuScreen extends ScreenAdapter {
         viewport = new ScreenViewport(new OrthographicCamera());
         stage = new Stage(viewport);
         font = new BitmapFont();
+        titleFont = new BitmapFont();
+        titleFont.getData().setScale(1.6f);
         whiteTex = makeWhiteTexture();
-        skin = buildSkin(font, whiteTex);
+        skin = buildSkin(font, titleFont, whiteTex);
 
-        // layout
         Table root = new Table();
         root.setFillParent(true);
         stage.addActor(root);
 
         // title
-        Label titleLabel = new Label("Purrsuit", skin, "title");
+        Label titleLabel = new Label("How to Play", skin, "title");
         titleLabel.setColor(Color.WHITE);
 
-        // buttons
-        TextButton playButton = new TextButton("Play", skin);
-        TextButton howToPlayButton = new TextButton("How to Play", skin);
-        TextButton exitButton = new TextButton("Exit", skin);
+        // instructions
+        String text =
+            "•Movement: Use WASD to move. \n\n" +
+            "• Yarn Attacks: Press SPACE to throw yarn. Hitting a mouse with yarn destroys it.\n\n" +
+            "• Tether & Cheese: A cheese wedge is tethered to you a few tiles behind your path. " +
+            "It counts as a solid object. Plan your route so you don't trap your cheese!\n\n" +
+            "• Mice Target the Cheese: Mice try to reach your cheese. The cheese takes 3 hits and you lose.\n\n" +
+            "• Bumping Mice: You can safely run into mice your cat is invulnerable. Colliding with a mouse removes it.\n\n" +
+            "• Catnip Power-Up: Picking up catnip speeds you up and makes mice flee from the cheese for a short time.\n\n" +
+            "• Switches & Doors: Shoot the small switch tiles to toggle their matching doors.\n\n" +
+            "• Coins: Collect all 3 coins in a level before entering the Exit to finish.\n\n";
 
-        // add listeners
-        playButton.addListener(e -> {
-            if(!playButton.isPressed()) return false; // only trigger on press
-            game.setScreen(new PlayScreen());
-            return true;
+        Label body = new Label(text, skin);
+        body.setWrap(true);
+        body.setAlignment(Align.topLeft);
+
+        ScrollPane scroll = new ScrollPane(body, skin);
+        scroll.setFadeScrollBars(false);
+        scroll.setScrollingDisabled(true, false);
+
+        // back button
+        TextButton backButton = new TextButton("Back to Main Menu", skin);
+        backButton.addListener(e -> {
+           if (!backButton.isPressed()) return false;
+           game.setScreen(new MainMenuScreen(game));
+           return true;
         });
 
-        howToPlayButton.addListener(e -> {
-            if (!howToPlayButton.isPressed()) return false;
-            game.setScreen(new HowToPlayScreen(game));
-            return true; // do nothing for now
-        });
-
-        exitButton.addListener(e -> {
-            if (!exitButton.isPressed()) return false;
-            Gdx.app.exit();
-            return true;
-        });
-
-        // assemble layout
-        root.defaults().pad(10f);
-        root.add(titleLabel).padTop(40f).row();
-        root.add(playButton).width(240f).height(56f).row();
-        root.add(howToPlayButton).width(240f).height(56f).row();
-        root.add(exitButton).width(240f).height(56f).row();
-
+        // layout
+        root.defaults().pad(12f);
+        root.add(titleLabel).padTop(24f).row();
+        root.add(scroll).grow().padLeft(24f).padRight(24f).row();
+        root.add(backButton).width(200f).height(50f).padBottom(24f);
         // input
         Gdx.input.setInputProcessor(stage);
     }
 
     @Override
     public void render(float delta) {
-        // clear to black
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
         stage.act(delta);
         stage.draw();
     }
 
     @Override
     public void resize(int width, int height) {
-        stage.getViewport().update(width, height, true);
+        viewport.update(width, height, true);
     }
 
     @Override
@@ -100,6 +105,7 @@ public class MainMenuScreen extends ScreenAdapter {
         if (font != null) font.dispose();
         if (whiteTex != null) whiteTex.dispose();
         if (skin != null) skin.dispose();
+        if (titleFont != null) titleFont.dispose();
     }
 
     // helpers
@@ -112,17 +118,19 @@ public class MainMenuScreen extends ScreenAdapter {
         return texture;
     }
 
-    private Skin buildSkin(BitmapFont font, Texture white) {
+    private Skin buildSkin(BitmapFont font, BitmapFont titleFont, Texture white) {
         Skin skin = new Skin();
 
         skin.add ("font", font, BitmapFont.class);
+        skin.add("titleFont", titleFont, BitmapFont.class);
         skin.add("white", white, Texture.class);
 
         // base drawables
-        Drawable bg = new TextureRegionDrawable(new TextureRegion(white)).tint(new Color(0f,0f,0f,0f));
+        Drawable panel = new TextureRegionDrawable(new TextureRegion(white)).tint(new Color(0f,0f,0f,0f));
         Drawable btnUp = new TextureRegionDrawable(new TextureRegion(white)).tint(new Color(0.15f,0.15f,0.15f,1f));
         Drawable btnDown = new TextureRegionDrawable(new TextureRegion(white)).tint(new Color(0.25f,0.25f,0.25f,1f));
         Drawable btnOver = new TextureRegionDrawable(new TextureRegion(white)).tint(new Color(0.2f,0.2f,0.2f,1f));
+        Drawable scrollBg = new TextureRegionDrawable(new TextureRegion(white)).tint(new Color(0.05f,0.05f,0.05f,1f));
 
         // Create a LabelStyle
         Label.LabelStyle labelStyle = new Label.LabelStyle();
@@ -132,8 +140,6 @@ public class MainMenuScreen extends ScreenAdapter {
 
         // Create a title LabelStyle
         Label.LabelStyle titleStyle = new Label.LabelStyle();
-        BitmapFont titleFont = new BitmapFont();
-        titleFont.getData().setScale(2.2f);
         titleStyle.font = titleFont;
         titleStyle.fontColor = Color.WHITE;
         skin.add("title", titleStyle);
@@ -147,8 +153,12 @@ public class MainMenuScreen extends ScreenAdapter {
         textButtonStyle.fontColor = Color.WHITE;
         skin.add("default", textButtonStyle);
 
+        ScrollPane.ScrollPaneStyle scrollStyle = new ScrollPane.ScrollPaneStyle();
+        scrollStyle.background = scrollBg;
+        skin.add("default", scrollStyle);
+
         // default background
-        skin.add("default-bg", bg);
+        skin.add("default-background", panel);
 
         return skin;
     }
