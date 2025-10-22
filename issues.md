@@ -15,8 +15,7 @@
 - **[11]** collectible coins require to clear level
 - **[12]** More levels
 - **[13]** Main menu
-- **[14]** Pause menu
-- **[15]** Game over screen
-- **[16]** Victory screen
-- **[17]** Cheat codes/cheat menu
+- **[14]** Game over screen
+- **[15]** Victory screen
+- **[16]** Cheat codes/cheat menu
 

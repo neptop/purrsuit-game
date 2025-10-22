@@ -64,7 +64,7 @@ public class HUD {
         for (int i = 0; i < maxHp; i++) {
             boolean filled = i < currentHp;
             if (filled) {
-                shapes.setColor(Color.YELLOW);
+                shapes.setColor(Color.PINK);
                 shapes.circle(startX + i * DOT_SPACING, y, DOT_RADIUS, 20);
             } else {
                 // outline circle for lost hp
