@@ -10,19 +10,16 @@ public class Level {
     private final List<Cell> spawners;
     private final Map<Character, List<Cell>> doorsById;
     private final Map<Character, List<Cell>> switchesById;
-    private final List<Cell> coins;
 
     public Level(WorldGrid grid, Cell start, Cell exit, List<Cell> spawners,
                  Map<Character, List<Cell>> doorsById,
-                 Map<Character, List<Cell>> switchesById,
-                 List<Cell> coins) {
+                 Map<Character, List<Cell>> switchesById) {
         this.grid = grid;
         this.start = start;
         this.exit = exit;
         this.spawners = spawners != null ? spawners : new ArrayList<Cell>();
         this.doorsById = doorsById != null ? doorsById : new HashMap<Character, List<Cell>>();
         this.switchesById = switchesById != null ? switchesById : new HashMap<Character, List<Cell>>();
-        this.coins = (coins != null) ? coins : new ArrayList<Cell>();
     }
 
     public WorldGrid getGrid() {
@@ -37,7 +34,7 @@ public class Level {
     public Map<Character, List<Cell>> getDoorsById() {return doorsById;}
     public Map<Character, List<Cell>> getSwitchesById() {return switchesById;}
     public List<Cell> getSpawners() { return spawners; }
-    public List<Cell> getCoins() { return coins; }
+
 
     public static Level ASCIIToLevel(String[] rows) {
         // row[0] is top row
@@ -50,7 +47,6 @@ public class Level {
         List<Cell> spawners = new ArrayList<Cell>();
         Map<Character, List<Cell>> doorsById = new HashMap<Character, List<Cell>>();
         Map<Character, List<Cell>> switchesById = new HashMap<Character, List<Cell>>();
-        List<Cell> coins = new ArrayList<Cell>();
 
         for (int ry = 0; ry < height; ry++) {
             String row = rows[ry];
@@ -90,8 +86,6 @@ public class Level {
                         switchesById.put(idLower, new ArrayList<Cell>());
                     }
                     switchesById.get(idLower).add(switchCell);
-                } else if (c == '$') { // coin
-                    coins.add(new Cell(x, y));
                 }
                 // else '.' or any other chari is treated as floor
             }
@@ -102,6 +96,6 @@ public class Level {
         if (exit == null) {
             throw new IllegalArgumentException("Level has no 'E' Exit");
         }
-        return new Level(grid, start, exit, spawners, doorsById, switchesById, coins);
+        return new Level(grid, start, exit, spawners, doorsById, switchesById);
     }
 }

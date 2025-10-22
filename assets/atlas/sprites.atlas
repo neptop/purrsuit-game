@@ -56,7 +56,7 @@ size: 2048, 2048
 format: RGBA8888
 filter: Nearest, Nearest
 repeat: none
-CoinTile
+DoorSideways
   rotate: false
   xy: 1, 1
   size: 1024, 1024
@@ -69,7 +69,7 @@ size: 2048, 2048
 format: RGBA8888
 filter: Nearest, Nearest
 repeat: none
-DoorSideways
+DoorUpDown
   rotate: false
   xy: 1, 1
   size: 1024, 1024
@@ -82,7 +82,7 @@ size: 2048, 2048
 format: RGBA8888
 filter: Nearest, Nearest
 repeat: none
-DoorUpDown
+Exit
   rotate: false
   xy: 1, 1
   size: 1024, 1024
@@ -95,7 +95,7 @@ size: 2048, 2048
 format: RGBA8888
 filter: Nearest, Nearest
 repeat: none
-Exit
+Floor
   rotate: false
   xy: 1, 1
   size: 1024, 1024
@@ -108,7 +108,7 @@ size: 2048, 2048
 format: RGBA8888
 filter: Nearest, Nearest
 repeat: none
-Floor
+Mouse
   rotate: false
   xy: 1, 1
   size: 1024, 1024
@@ -121,7 +121,7 @@ size: 2048, 2048
 format: RGBA8888
 filter: Nearest, Nearest
 repeat: none
-Mouse
+Spawner
   rotate: false
   xy: 1, 1
   size: 1024, 1024
@@ -134,7 +134,7 @@ size: 2048, 2048
 format: RGBA8888
 filter: Nearest, Nearest
 repeat: none
-Spawner
+Start
   rotate: false
   xy: 1, 1
   size: 1024, 1024
@@ -147,7 +147,7 @@ size: 2048, 2048
 format: RGBA8888
 filter: Nearest, Nearest
 repeat: none
-Start
+Switch
   rotate: false
   xy: 1, 1
   size: 1024, 1024
@@ -160,19 +160,6 @@ size: 2048, 2048
 format: RGBA8888
 filter: Nearest, Nearest
 repeat: none
-Switch
-  rotate: false
-  xy: 1, 1
-  size: 1024, 1024
-  orig: 1024, 1024
-  offset: 0, 0
-  index: -1
-
-sprites14.png
-size: 2048, 2048
-format: RGBA8888
-filter: Nearest, Nearest
-repeat: none
 Wall
   rotate: false
   xy: 1, 1
@@ -181,7 +168,7 @@ Wall
   offset: 0, 0
   index: -1
 
-sprites15.png
+sprites14.png
 size: 2048, 2048
 format: RGBA8888
 filter: Nearest, Nearest

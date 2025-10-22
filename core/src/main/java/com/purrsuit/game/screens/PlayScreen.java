@@ -47,8 +47,6 @@ public class PlayScreen extends ScreenAdapter {
     private SpriteBatch batch;
     private PowerUpSystem powerUps;
     private List<PowerUpPickup> pickups;
-    private CoinSystem coins;
-    private static final int REQUIRED_COINS = 3; // coins needed to exit level
 
     @Override
     public void show() {
@@ -81,9 +79,6 @@ public class PlayScreen extends ScreenAdapter {
         // door and switch systems
         doorSystem = new DoorSystem();
         switchSystem = new SwitchSystem();
-
-        // coins
-        coins = new CoinSystem(level.getCoins());
 
         // build from level data
         for (Map.Entry<Character, List<Cell>> doorEntry : level.getDoorsById().entrySet()) {
@@ -160,7 +155,6 @@ public class PlayScreen extends ScreenAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT); // clear the screen
 
         powerUps.update(delta);
-
         // pickup lifecycle and collection
         for (int i = pickups.size() - 1; i >= 0; i--) {
             PowerUpPickup p = pickups.get(i);
@@ -177,7 +171,6 @@ public class PlayScreen extends ScreenAdapter {
 
         if (!win){
             player.update(delta);
-            coins.collect(player.getCurrentCell());
 
             // shoot yarn projectile
             if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
@@ -204,10 +197,7 @@ public class PlayScreen extends ScreenAdapter {
             }
 
             if (now.equals(exitCell)){
-                int required = Math.min(REQUIRED_COINS, coins.getTotalCoins());
-                if(coins.getCollectedCoins() >= required) {
-                    win = true;
-                }
+                win = true;
             }
         }
 
@@ -262,10 +252,6 @@ public class PlayScreen extends ScreenAdapter {
             Cell sc = s.getCell();
             batch.draw(switchTex, sc.x(), sc.y(), 1f, 1f);
         }
-
-        // draw coins
-        TextureAtlas.AtlasRegion coinTex = atlas.findRegion("CoinTile");
-        coins.render(batch, coinTex);
 
         // regions for entities
         TextureAtlas.AtlasRegion catTex = atlas.findRegion("Cat_idle");
