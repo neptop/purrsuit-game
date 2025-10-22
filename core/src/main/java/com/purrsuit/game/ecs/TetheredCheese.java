@@ -14,16 +14,18 @@ public class TetheredCheese {
     private final int tetherLength; // distance behind player (3 cells atm)
     private int maxHp = 3;
     private int currentHp = maxHp;
+    private boolean invulnerable = false;
 
     // getters
     public int getMaxHp() { return maxHp; }
     public int getCurrentHp() { return currentHp; }
+    public boolean isInvulnerable() { return invulnerable; }
 
     // methods
     public boolean isNotActive() { return currentHp <= 0; }
-    public void damage (int amount) { currentHp = Math.max(0, currentHp - amount); }
+    public void damage (int amount) { if (invulnerable) return; currentHp = Math.max(0, currentHp - amount); }
     public void heal (int amount) { currentHp = Math.min(maxHp, currentHp + amount); }
-
+    public void setInvulnerable(boolean invulnerable) { this.invulnerable = invulnerable; }
 
     public TetheredCheese(Cell start, int tetherLength) {
         this.tetherLength = Math.max(1, tetherLength);
