@@ -11,6 +11,7 @@ Currently only 3 levels are playable.
 - F1 or ~ (tilde) - toggle cheat console
 - Mouse - UI only
 
+## START COPILOT EDIT
 ## Build a Windows executable (.exe)
 
 From the repository root, run:
@@ -28,7 +29,8 @@ The Windows package is generated under:
 Open `lwjgl3/build/construo/winX64/roast/Purrsuit.exe`.
 
 Important: the launcher is not a standalone `.exe`. Keep `Purrsuit.exe`, `Purrsuit-1.0.0.jar`, the `app/` folder, and the `runtime/` folder together or the game will not start.
-  
+## END COPILOT EDIT
+
 ## Cheat Console Commands
 - 'help' - list all commands
 - 'god' - cheese becomes invulnernable to all damage
