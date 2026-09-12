@@ -125,12 +125,7 @@ construo {
     jlink {
       guessModulesFromJar.set(false)
       modules.set([
-        "java.base",
-        "java.desktop",
-        "java.logging",
-        "java.management",
-        "java.naming",
-        "java.xml",
+        "java.se",
         "jdk.unsupported"
       ])
     }
