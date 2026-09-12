@@ -10,6 +10,22 @@ Currently only 3 levels are playable.
 - Space - shoot yarn
 - F1 or ~ (tilde) - toggle cheat console
 - Mouse - UI only
+
+## Build a Windows executable (.exe)
+
+From the repository root, run:
+
+`./gradlew lwjgl3:packageWinX64`
+
+On Windows command prompt/PowerShell, run:
+
+`gradlew.bat lwjgl3:packageWinX64`
+
+The packaged launcher executable is generated under:
+
+`lwjgl3/build/construo/winX64/`
+
+Look for `Purrsuit.exe` inside that folder.
   
 ## Cheat Console Commands
 - 'help' - list all commands

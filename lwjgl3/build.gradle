@@ -122,6 +122,13 @@ construo {
     humanName.set(appName)
     // Optional, defaults to project version property
     version.set("$projectVersion")
+    jlink {
+      guessModulesFromJar.set(false)
+      modules.set([
+        "java.se",
+        "jdk.unsupported"
+      ])
+    }
 
     targets.configure {
       register("linuxX64", Target.Linux) {
