@@ -17,9 +17,13 @@ From the repository root, run:
 
 `./gradlew lwjgl3:packageWinX64`
 
+On Windows command prompt/PowerShell, run:
+
+`gradlew.bat lwjgl3:packageWinX64`
+
 The packaged launcher executable is generated at:
 
-`/home/runner/work/purrsuit-game/purrsuit-game/lwjgl3/build/construo/winX64/roast/Purrsuit.exe`
+`lwjgl3/build/construo/winX64/roast/Purrsuit.exe`
   
 ## Cheat Console Commands
 - 'help' - list all commands
