@@ -21,11 +21,13 @@ On Windows command prompt/PowerShell, run:
 
 `gradlew.bat lwjgl3:packageWinX64`
 
-The packaged launcher executable is generated under:
+The Windows package is generated under:
 
 `lwjgl3/build/construo/winX64/`
 
-Look for `Purrsuit.exe` inside that folder.
+Open `lwjgl3/build/construo/winX64/roast/Purrsuit.exe`.
+
+Important: the launcher is not a standalone `.exe`. Keep `Purrsuit.exe`, `Purrsuit-1.0.0.jar`, the `app/` folder, and the `runtime/` folder together or the game will not start.
   
 ## Cheat Console Commands
 - 'help' - list all commands
