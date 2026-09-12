@@ -21,7 +21,7 @@ On Windows command prompt/PowerShell, run:
 
 `gradlew.bat lwjgl3:packageWinX64`
 
-The packaged launcher executable is generated at:
+The packaged launcher executable is generated under `lwjgl3/build/construo/winX64/` (typically at):
 
 `lwjgl3/build/construo/winX64/roast/Purrsuit.exe`
   
