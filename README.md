@@ -10,6 +10,16 @@ Currently only 3 levels are playable.
 - Space - shoot yarn
 - F1 or ~ (tilde) - toggle cheat console
 - Mouse - UI only
+
+## Build a Windows executable (.exe)
+
+From the repository root, run:
+
+`./gradlew lwjgl3:packageWinX64`
+
+The packaged launcher executable is generated under:
+
+`/home/runner/work/purrsuit-game/purrsuit-game/lwjgl3/build/construo/windowsX64/`
   
 ## Cheat Console Commands
 - 'help' - list all commands
