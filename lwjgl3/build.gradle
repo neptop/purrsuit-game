@@ -122,33 +122,27 @@ construo {
     humanName.set(appName)
     // Optional, defaults to project version property
     version.set("$projectVersion")
+    jlink {
+      guessModulesFromJar.set(false)
+      modules.set([
+        "java.base",
+        "java.desktop",
+        "java.logging",
+        "java.management",
+        "java.naming",
+        "java.xml",
+        "jdk.unsupported"
+      ])
+    }
 
     targets.configure {
       register("linuxX64", Target.Linux) {
         architecture.set(Target.Architecture.X86_64)
-        modules.set([
-          "java.base",
-          "java.desktop",
-          "java.logging",
-          "java.management",
-          "java.naming",
-          "java.xml",
-          "jdk.unsupported"
-        ])
         jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.15%2B6/OpenJDK17U-jdk_x64_linux_hotspot_17.0.15_6.tar.gz")
         // Linux does not currently have a way to set the icon on the executable
       }
       register("macM1", Target.MacOs) {
         architecture.set(Target.Architecture.AARCH64)
-        modules.set([
-          "java.base",
-          "java.desktop",
-          "java.logging",
-          "java.management",
-          "java.naming",
-          "java.xml",
-          "jdk.unsupported"
-        ])
         jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.15%2B6/OpenJDK17U-jdk_aarch64_mac_hotspot_17.0.15_6.tar.gz")
         // macOS needs an identifier
         identifier.set("com.purrsuit.game." + appName)
@@ -157,15 +151,6 @@ construo {
       }
       register("macX64", Target.MacOs) {
         architecture.set(Target.Architecture.X86_64)
-        modules.set([
-          "java.base",
-          "java.desktop",
-          "java.logging",
-          "java.management",
-          "java.naming",
-          "java.xml",
-          "jdk.unsupported"
-        ])
         jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.15%2B6/OpenJDK17U-jdk_x64_mac_hotspot_17.0.15_6.tar.gz")
         // macOS needs an identifier
         identifier.set("com.purrsuit.game." + appName)
@@ -174,15 +159,6 @@ construo {
       }
       register("winX64", Target.Windows) {
         architecture.set(Target.Architecture.X86_64)
-        modules.set([
-          "java.base",
-          "java.desktop",
-          "java.logging",
-          "java.management",
-          "java.naming",
-          "java.xml",
-          "jdk.unsupported"
-        ])
         // Optional: icon for Windows, as a PNG
         icon.set(project.file("icons/logo.png"))
         jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.15%2B6/OpenJDK17U-jdk_x64_windows_hotspot_17.0.15_6.zip")
